@@ -1,34 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {
-  Fab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
+import { Fab } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import MeasurementForm from "./MeasurementForm";
+import MeasurementList from "./MeasurementList";
 
-// MeasurementForm and MeasurementList in one component
 const BodyMeasurementTracker = () => {
-  const [open, setOpen] = useState(false); // To handle dialog open/close
-  const [measurements, setMeasurements] = useState({
-    weight: "",
-    bodyFat: "",
-    chest: "",
-    waist: "",
-    arm: "",
-    leg: "",
-    date: "",
-  });
+  const [open, setOpen] = useState(false);
   const [measurementData, setMeasurementData] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null); // For edit mode
 
   // Fetch saved data from localStorage on component mount
   useEffect(() => {
@@ -37,37 +16,41 @@ const BodyMeasurementTracker = () => {
     setMeasurementData(savedMeasurements);
   }, []);
 
-  // Handle form input change
-  const handleChange = (e) => {
-    setMeasurements({
-      ...measurements,
-      [e.target.name]: e.target.value,
-    });
+  // Handle adding or editing a measurement
+  const addMeasurement = (newMeasurement) => {
+    if (editingIndex !== null) {
+      // Editing existing measurement
+      const updatedMeasurements = measurementData.map((item, index) =>
+        index === editingIndex ? newMeasurement : item
+      );
+      setMeasurementData(updatedMeasurements);
+      localStorage.setItem("measurements", JSON.stringify(updatedMeasurements));
+      setEditingIndex(null); // Reset after editing
+    } else {
+      // Adding new measurement
+      const updatedMeasurements = [...measurementData, newMeasurement];
+      setMeasurementData(updatedMeasurements);
+      localStorage.setItem("measurements", JSON.stringify(updatedMeasurements));
+    }
+    setOpen(false); // Close form after adding/editing
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    let savedMeasurements =
-      JSON.parse(localStorage.getItem("measurements")) || [];
-    savedMeasurements.push(measurements);
-    localStorage.setItem("measurements", JSON.stringify(savedMeasurements));
-    setMeasurementData(savedMeasurements); // Update the list
-    setMeasurements({
-      weight: "",
-      bodyFat: "",
-      chest: "",
-      waist: "",
-      arm: "",
-      leg: "",
-      date: "",
-    });
-    setOpen(false); // Close the dialog after submission
+  // Handle opening form for editing
+  const handleEdit = (index) => {
+    setEditingIndex(index); // Set the index of the measurement to be edited
+    setOpen(true); // Open the form for editing
   };
 
-  // Handle opening/closing dialog
+  // Handle deleting a measurement
+  const handleDelete = (index) => {
+    const updatedMeasurements = measurementData.filter((_, i) => i !== index);
+    setMeasurementData(updatedMeasurements);
+    localStorage.setItem("measurements", JSON.stringify(updatedMeasurements));
+  };
+
   const handleClickOpen = () => {
     setOpen(true);
+    setEditingIndex(null); // Reset editing index if adding new measurement
   };
 
   const handleClose = () => {
@@ -76,7 +59,7 @@ const BodyMeasurementTracker = () => {
 
   return (
     <div>
-      {/* FAB button to open the form in dialog */}
+      {/* Floating Action Button to open form */}
       <Fab
         color="primary"
         aria-label="add"
@@ -86,121 +69,22 @@ const BodyMeasurementTracker = () => {
         <AddIcon />
       </Fab>
 
-      {/* Dialog for the Measurement Form */}
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Body Measurement</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmit}>
-            <TextField
-              label="Date"
-              type="date"
-              name="date"
-              value={measurements.date}
-              onChange={handleChange}
-              fullWidth
-              required
-              InputLabelProps={{
-                shrink: true,
-              }}
-              margin="dense"
-            />
-            <TextField
-              label="Weight (kg)"
-              type="number"
-              name="weight"
-              value={measurements.weight}
-              onChange={handleChange}
-              fullWidth
-              required
-              margin="dense"
-            />
-            <TextField
-              label="Body Fat (%)"
-              type="number"
-              name="bodyFat"
-              value={measurements.bodyFat}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label="Chest (cm)"
-              type="number"
-              name="chest"
-              value={measurements.chest}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label="Waist (cm)"
-              type="number"
-              name="waist"
-              value={measurements.waist}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label="Arm (cm)"
-              type="number"
-              name="arm"
-              value={measurements.arm}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label="Leg (cm)"
-              type="number"
-              name="leg"
-              value={measurements.leg}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <Button
-              type="submit"
-              color="primary"
-              variant="contained"
-              style={{ marginTop: "1rem" }}
-              fullWidth
-            >
-              Save
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Measurement Form Component */}
+      <MeasurementForm
+        open={open}
+        onClose={handleClose}
+        addMeasurement={addMeasurement}
+        initialData={
+          editingIndex !== null ? measurementData[editingIndex] : null
+        } // Pass initial data for editing
+      />
 
-      {/* Measurement List */}
-      <TableContainer component={Paper} style={{ marginTop: "2rem" }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell>Weight (kg)</TableCell>
-              <TableCell>Body Fat (%)</TableCell>
-              <TableCell>Chest (cm)</TableCell>
-              <TableCell>Waist (cm)</TableCell>
-              <TableCell>Arm (cm)</TableCell>
-              <TableCell>Leg (cm)</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {measurementData.map((measurement, index) => (
-              <TableRow key={index}>
-                <TableCell>{measurement.date}</TableCell>
-                <TableCell>{measurement.weight}</TableCell>
-                <TableCell>{measurement.bodyFat}</TableCell>
-                <TableCell>{measurement.chest}</TableCell>
-                <TableCell>{measurement.waist}</TableCell>
-                <TableCell>{measurement.arm}</TableCell>
-                <TableCell>{measurement.leg}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {/* Measurement List Component */}
+      <MeasurementList
+        measurementData={measurementData}
+        onEdit={handleEdit} // Pass edit handler
+        onDelete={handleDelete} // Pass delete handler
+      />
     </div>
   );
 };
