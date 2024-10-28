@@ -5,16 +5,11 @@ import {
   DialogContent,
   TextField,
   Button,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
 } from "@mui/material";
 
 const MeasurementForm = ({ open, onClose, addMeasurement }) => {
   const [measurements, setMeasurements] = useState({
     date: "",
-    height: "",
     weight: "",
     waist: "",
     bodyFat: "",
@@ -29,11 +24,6 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
     calf: "",
     progressPicture: "",
   });
-
-  const [unit, setUnit] = useState("cm"); // Unit state to track selected unit (cm or inches)
-
-  // Convert inches to centimeters
-  const inchesToCm = (inches) => inches * 2.54;
 
   // Handle form input change
   const handleChange = (e) => {
@@ -58,35 +48,13 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
     }
   };
 
-  // Handle unit change (cm or inches)
-  const handleUnitChange = (e) => {
-    setUnit(e.target.value);
-  };
-
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Convert all applicable values to cm if unit is inches
     const convertedMeasurements = { ...measurements };
-    if (unit === "inches") {
-      convertedMeasurements.height = inchesToCm(measurements.height);
-      convertedMeasurements.waist = inchesToCm(measurements.waist);
-      convertedMeasurements.neck = inchesToCm(measurements.neck);
-      convertedMeasurements.shoulder = inchesToCm(measurements.shoulder);
-      convertedMeasurements.chest = inchesToCm(measurements.chest);
-      convertedMeasurements.biceps = inchesToCm(measurements.biceps);
-      convertedMeasurements.forearm = inchesToCm(measurements.forearm);
-      convertedMeasurements.abdomen = inchesToCm(measurements.abdomen);
-      convertedMeasurements.hips = inchesToCm(measurements.hips);
-      convertedMeasurements.thighs = inchesToCm(measurements.thighs);
-      convertedMeasurements.calf = inchesToCm(measurements.calf);
-    }
-
-    addMeasurement(convertedMeasurements); // Call the addMeasurement method from parent
+    addMeasurement(convertedMeasurements);
     setMeasurements({
       date: "",
-      height: "",
       weight: "",
       waist: "",
       bodyFat: "",
@@ -122,28 +90,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             }}
             margin="dense"
           />
-          {/* Unit selection dropdown */}
-          <FormControl fullWidth margin="dense">
-            <InputLabel id="unit-label">Measurement Unit</InputLabel>
-            <Select
-              labelId="unit-label"
-              value={unit}
-              onChange={handleUnitChange}
-            >
-              <MenuItem value="cm">Centimeters (cm)</MenuItem>
-              <MenuItem value="inches">Inches (in)</MenuItem>
-            </Select>
-          </FormControl>
 
-          <TextField
-            label={`Height (${unit})`}
-            type="number"
-            name="height"
-            value={measurements.height}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-          />
           <TextField
             label="Weight (kg)"
             type="number"
@@ -155,7 +102,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Waist (${unit})`}
+            label={`Waist (cm)`}
             type="number"
             name="waist"
             value={measurements.waist}
@@ -173,7 +120,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Neck (${unit})`}
+            label={`Neck (cm)`}
             type="number"
             name="neck"
             value={measurements.neck}
@@ -182,7 +129,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Shoulder (${unit})`}
+            label={`Shoulder (cm)`}
             type="number"
             name="shoulder"
             value={measurements.shoulder}
@@ -191,7 +138,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Chest (${unit})`}
+            label={`Chest (cm)`}
             type="number"
             name="chest"
             value={measurements.chest}
@@ -200,7 +147,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Biceps (${unit})`}
+            label={`Biceps (cm)`}
             type="number"
             name="biceps"
             value={measurements.biceps}
@@ -209,7 +156,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Forearm (${unit})`}
+            label={`Forearm (cm)`}
             type="number"
             name="forearm"
             value={measurements.forearm}
@@ -218,7 +165,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Abdomen (${unit})`}
+            label={`Abdomen (cm)`}
             type="number"
             name="abdomen"
             value={measurements.abdomen}
@@ -227,7 +174,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Hips (${unit})`}
+            label={`Hips (cm)`}
             type="number"
             name="hips"
             value={measurements.hips}
@@ -236,7 +183,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Thighs (${unit})`}
+            label={`Thighs (cm)`}
             type="number"
             name="thighs"
             value={measurements.thighs}
@@ -245,7 +192,7 @@ const MeasurementForm = ({ open, onClose, addMeasurement }) => {
             margin="dense"
           />
           <TextField
-            label={`Calf (${unit})`}
+            label={`Calf (cm)`}
             type="number"
             name="calf"
             value={measurements.calf}

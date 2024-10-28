@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,38 +8,86 @@ import {
   TableRow,
   Paper,
   IconButton,
+  TableSortLabel,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
+import formattedDate from "./CommonFunctions";
 
 const MeasurementList = ({ measurementData, onEdit, onDelete }) => {
+  const [sortConfig, setSortConfig] = useState({
+    key: "date",
+    direction: "asc",
+  });
+
+  const sortedData = React.useMemo(() => {
+    const sortedArray = [...measurementData];
+    sortedArray.sort((a, b) => {
+      if (sortConfig.key === "date") {
+        return (
+          (new Date(a[sortConfig.key]) - new Date(b[sortConfig.key])) *
+          (sortConfig.direction === "asc" ? 1 : -1)
+        );
+      } else {
+        return (
+          (a[sortConfig.key] < b[sortConfig.key] ? -1 : 1) *
+          (sortConfig.direction === "asc" ? 1 : -1)
+        );
+      }
+    });
+    return sortedArray;
+  }, [measurementData, sortConfig]);
+
+  const handleSortRequest = (key) => {
+    setSortConfig((prevConfig) => ({
+      key,
+      direction:
+        prevConfig.key === key && prevConfig.direction === "asc"
+          ? "desc"
+          : "asc",
+    }));
+  };
+
   return (
     <TableContainer component={Paper} style={{ marginTop: "2rem" }}>
-      <Table>
+      <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Height (cm)</TableCell>
-            <TableCell>Weight (kg)</TableCell>
-            <TableCell>Waist (cm)</TableCell>
-            <TableCell>Body Fat (%)</TableCell>
-            <TableCell>Neck (cm)</TableCell>
-            <TableCell>Shoulder (cm)</TableCell>
-            <TableCell>Chest (cm)</TableCell>
-            <TableCell>Biceps (cm)</TableCell>
-            <TableCell>Forearm (cm)</TableCell>
-            <TableCell>Abdomen (cm)</TableCell>
-            <TableCell>Hips (cm)</TableCell>
-            <TableCell>Thighs (cm)</TableCell>
-            <TableCell>Calf (cm)</TableCell>
-            <TableCell>Progress Picture</TableCell>
-            <TableCell>Actions</TableCell> {/* New Actions Column */}
+            {[
+              { label: "Date", key: "date" },
+              { label: "Weight (kg)", key: "weight" },
+              { label: "Waist (cm)", key: "waist" },
+              { label: "Body Fat (%)", key: "bodyFat" },
+              { label: "Neck (cm)", key: "neck" },
+              { label: "Shoulder (cm)", key: "shoulder" },
+              { label: "Chest (cm)", key: "chest" },
+              { label: "Biceps (cm)", key: "biceps" },
+              { label: "Forearm (cm)", key: "forearm" },
+              { label: "Abdomen (cm)", key: "abdomen" },
+              { label: "Hips (cm)", key: "hips" },
+              { label: "Thighs (cm)", key: "thighs" },
+              { label: "Calf (cm)", key: "calf" },
+              { label: "Progress Picture", key: "progressPicture" },
+            ].map((column) => (
+              <TableCell key={column.key}>
+                <TableSortLabel
+                  active={sortConfig.key === column.key}
+                  direction={
+                    sortConfig.key === column.key ? sortConfig.direction : "asc"
+                  }
+                  onClick={() => handleSortRequest(column.key)}
+                >
+                  {column.label}
+                </TableSortLabel>
+              </TableCell>
+            ))}
+            <TableCell>Actions</TableCell>{" "}
+            {/* Actions column without sorting */}
           </TableRow>
         </TableHead>
         <TableBody>
-          {measurementData.map((measurement, index) => (
+          {sortedData.map((measurement, index) => (
             <TableRow key={index}>
-              <TableCell>{measurement.date}</TableCell>
-              <TableCell>{measurement.height}</TableCell>
+              <TableCell>{formattedDate(measurement.date)}</TableCell>
               <TableCell>{measurement.weight}</TableCell>
               <TableCell>{measurement.waist}</TableCell>
               <TableCell>{measurement.bodyFat}</TableCell>
@@ -59,15 +107,14 @@ const MeasurementList = ({ measurementData, onEdit, onDelete }) => {
                     alt="Progress"
                     width="50"
                     height="50"
+                    style={{ borderRadius: "50%" }}
                   />
                 )}
               </TableCell>
               <TableCell>
-                {/* Edit Button */}
                 <IconButton onClick={() => onEdit(index)}>
                   <Edit />
                 </IconButton>
-                {/* Delete Button */}
                 <IconButton onClick={() => onDelete(index)}>
                   <Delete />
                 </IconButton>

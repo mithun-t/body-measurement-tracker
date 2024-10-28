@@ -11,8 +11,11 @@ const BodyMeasurementTracker = () => {
 
   // Fetch saved data from localStorage on component mount
   useEffect(() => {
-    const savedMeasurements =
+    let savedMeasurements =
       JSON.parse(localStorage.getItem("measurements")) || [];
+    savedMeasurements = savedMeasurements.sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
     setMeasurementData(savedMeasurements);
   }, []);
 
