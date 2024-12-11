@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/body-measurement-tracker/static/css/main.f855e6bc.css",
-    "main.js": "/body-measurement-tracker/static/js/main.b32e2f44.js",
+    "main.js": "/body-measurement-tracker/static/js/main.4dd59660.js",
     "static/js/453.7c61478c.chunk.js": "/body-measurement-tracker/static/js/453.7c61478c.chunk.js",
     "index.html": "/body-measurement-tracker/index.html",
     "main.f855e6bc.css.map": "/body-measurement-tracker/static/css/main.f855e6bc.css.map",
-    "main.b32e2f44.js.map": "/body-measurement-tracker/static/js/main.b32e2f44.js.map",
+    "main.4dd59660.js.map": "/body-measurement-tracker/static/js/main.4dd59660.js.map",
     "453.7c61478c.chunk.js.map": "/body-measurement-tracker/static/js/453.7c61478c.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f855e6bc.css",
-    "static/js/main.b32e2f44.js"
+    "static/js/main.4dd59660.js"
   ]
 }
