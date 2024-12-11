@@ -8,8 +8,13 @@ import {
 } from "@mui/material";
 
 const MeasurementForm = ({ open, onClose, addMeasurement }) => {
+  // Function to get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0]; // Extract YYYY-MM-DD from ISO string
+  };
   const [measurements, setMeasurements] = useState({
-    date: "",
+    date: getTodayDate(),
     weight: "",
     waist: "",
     bodyFat: "",
