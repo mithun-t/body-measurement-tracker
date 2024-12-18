@@ -50,7 +50,6 @@ const Dashboard = () => {
   // Prepare data for the weight trend line chart
   const dates = measurementData.map((entry) => entry.date);
   const weights = measurementData.map((entry) => entry.weight);
-  const bodyFats = measurementData.map((entry) => entry.bodyFat);
 
   const data = {
     labels: dates,
@@ -60,13 +59,6 @@ const Dashboard = () => {
         data: weights,
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
-        tension: 0.3,
-      },
-      {
-        label: "Body Fat (%)",
-        data: bodyFats,
-        borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
         tension: 0.3,
       },
     ],
@@ -80,7 +72,7 @@ const Dashboard = () => {
       },
       title: {
         display: true,
-        text: "Weight and Body Fat Trends Over Time",
+        text: "Weight Trends Over Time",
       },
     },
     scales: {
@@ -108,10 +100,6 @@ const Dashboard = () => {
         <Grid item xs={6}>
           <Typography variant="subtitle1">Average Weight (kg):</Typography>
           <Typography variant="h6">{averageWeight}</Typography>
-        </Grid>
-        <Grid item xs={6}>
-          <Typography variant="subtitle1">Average Body Fat (%):</Typography>
-          <Typography variant="h6">{averageBodyFat}</Typography>
         </Grid>
       </Grid>
       <Line data={data} options={options} />

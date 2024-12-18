@@ -23,7 +23,6 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 
 import Dashboard from "./Dashboard";
-import BackupRestore from "./BackupRestore";
 import Measurements from "./Measurements";
 
 const drawerWidth = 240;
@@ -85,8 +84,6 @@ function MainLayout(props) {
         return <Dashboard />;
       case "Measurements":
         return <Measurements />;
-      case "Backup":
-        return <BackupRestore />;
       default:
         return <Dashboard />;
     }

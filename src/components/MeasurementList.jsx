@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableBody,
@@ -11,17 +12,67 @@ import {
   TableSortLabel,
   Checkbox,
   FormControlLabel,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import formattedDate from "./CommonFunctions";
 
-const MeasurementList = ({ measurementData, onEdit, onDelete }) => {
+const BASE_URL = "http://localhost:5147/api";
+
+const formattedDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const MeasurementList = ({ userId }) => {
+  const [measurementData, setMeasurementData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({
     key: "date",
-    direction: "asc",
+    direction: "desc",
   });
-  const [showAllColumns, setShowAllColumns] = useState(false); // Checkbox state
+  const [showAllColumns, setShowAllColumns] = useState(false);
+  const [editingMeasurement, setEditingMeasurement] = useState(null);
 
+  // Fetch measurements
+  const fetchMeasurements = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
+        params: { userId },
+      });
+      console.log(response);
+      setMeasurementData(response.data);
+    } catch (err) {
+      setError(err.response?.data || "Failed to fetch measurements");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMeasurements();
+  }, [userId]);
+
+  // Delete measurement
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${BASE_URL}/BodyMeasurement/${id}`);
+      fetchMeasurements(); // Refresh the list
+    } catch (err) {
+      setError(err.response?.data || "Failed to delete measurement");
+    }
+  };
+
+  // Sorting logic
   const sortedData = React.useMemo(() => {
     const sortedArray = [...measurementData];
     sortedArray.sort((a, b) => {
@@ -54,8 +105,45 @@ const MeasurementList = ({ measurementData, onEdit, onDelete }) => {
     setShowAllColumns((prev) => !prev);
   };
 
+  // Error handling
+  const handleCloseError = () => {
+    setError(null);
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="200px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <div style={{ marginTop: "2rem" }}>
+      {/* Error Snackbar */}
+      {error && (
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={handleCloseError}
+        >
+          <Alert
+            onClose={handleCloseError}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {error}
+          </Alert>
+        </Snackbar>
+      )}
+
+      {/* Columns Toggle */}
       <FormControlLabel
         control={
           <Checkbox
@@ -66,121 +154,120 @@ const MeasurementList = ({ measurementData, onEdit, onDelete }) => {
         }
         label="Display all measurements"
       />
-      <TableContainer component={Paper}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              {/* Adjust visible columns based on checkbox */}
-              <TableCell>
-                <TableSortLabel
-                  active={sortConfig.key === "date"}
-                  direction={
-                    sortConfig.key === "date" ? sortConfig.direction : "asc"
-                  }
-                  onClick={() => handleSortRequest("date")}
-                >
-                  Date
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortConfig.key === "weight"}
-                  direction={
-                    sortConfig.key === "weight" ? sortConfig.direction : "asc"
-                  }
-                  onClick={() => handleSortRequest("weight")}
-                >
-                  Weight (kg)
-                </TableSortLabel>
-              </TableCell>
-              {showAllColumns && ( // Show additional columns based on checkbox
-                <>
-                  <TableCell>
-                    <TableSortLabel
-                      active={sortConfig.key === "waist"}
-                      direction={
-                        sortConfig.key === "waist"
-                          ? sortConfig.direction
-                          : "asc"
-                      }
-                      onClick={() => handleSortRequest("waist")}
-                    >
-                      Waist (cm)
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel
-                      active={sortConfig.key === "bodyFat"}
-                      direction={
-                        sortConfig.key === "bodyFat"
-                          ? sortConfig.direction
-                          : "asc"
-                      }
-                      onClick={() => handleSortRequest("bodyFat")}
-                    >
-                      Body Fat (%)
-                    </TableSortLabel>
-                  </TableCell>
-                  {/* Add other columns as needed */}
-                  <TableCell>Neck (cm)</TableCell>
-                  <TableCell>Shoulder (cm)</TableCell>
-                  <TableCell>Chest (cm)</TableCell>
-                  <TableCell>Biceps (cm)</TableCell>
-                  <TableCell>Forearm (cm)</TableCell>
-                  <TableCell>Abdomen (cm)</TableCell>
-                  <TableCell>Hips (cm)</TableCell>
-                  <TableCell>Thighs (cm)</TableCell>
-                  <TableCell>Calf (cm)</TableCell>
-                  <TableCell>Progress Picture</TableCell>
-                </>
-              )}
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sortedData.map((measurement, index) => (
-              <TableRow key={index}>
-                <TableCell>{formattedDate(measurement.date)}</TableCell>
-                <TableCell>{measurement.weight}</TableCell>
-                {showAllColumns && ( // Render additional columns based on checkbox
+
+      {/* Measurements Table */}
+      {measurementData.length === 0 ? (
+        <Box textAlign="center" p={3}>
+          No measurements recorded yet.
+        </Box>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                {/* Table headers remain similar to previous implementation */}
+                <TableCell>
+                  <TableSortLabel
+                    active={sortConfig.key === "date"}
+                    direction={
+                      sortConfig.key === "date" ? sortConfig.direction : "desc"
+                    }
+                    onClick={() => handleSortRequest("date")}
+                  >
+                    Date
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortConfig.key === "weight"}
+                    direction={
+                      sortConfig.key === "weight" ? sortConfig.direction : "asc"
+                    }
+                    onClick={() => handleSortRequest("weight")}
+                  >
+                    Weight (kg)
+                  </TableSortLabel>
+                </TableCell>
+                {showAllColumns && ( // Show additional columns based on checkbox
                   <>
-                    <TableCell>{measurement.waist}</TableCell>
-                    <TableCell>{measurement.bodyFat}</TableCell>
-                    <TableCell>{measurement.neck}</TableCell>
-                    <TableCell>{measurement.shoulder}</TableCell>
-                    <TableCell>{measurement.chest}</TableCell>
-                    <TableCell>{measurement.biceps}</TableCell>
-                    <TableCell>{measurement.forearm}</TableCell>
-                    <TableCell>{measurement.abdomen}</TableCell>
-                    <TableCell>{measurement.hips}</TableCell>
-                    <TableCell>{measurement.thighs}</TableCell>
-                    <TableCell>{measurement.calf}</TableCell>
                     <TableCell>
-                      {measurement.progressPicture && (
-                        <img
-                          src={measurement.progressPicture}
-                          alt="Progress"
-                          width="50"
-                          height="50"
-                          style={{ borderRadius: "50%" }}
-                        />
-                      )}
+                      <TableSortLabel
+                        active={sortConfig.key === "waist"}
+                        direction={
+                          sortConfig.key === "waist"
+                            ? sortConfig.direction
+                            : "asc"
+                        }
+                        onClick={() => handleSortRequest("waist")}
+                      >
+                        Waist (cm)
+                      </TableSortLabel>
                     </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={sortConfig.key === "bodyFat"}
+                        direction={
+                          sortConfig.key === "bodyFat"
+                            ? sortConfig.direction
+                            : "asc"
+                        }
+                        onClick={() => handleSortRequest("bodyFat")}
+                      >
+                        Body Fat (%)
+                      </TableSortLabel>
+                    </TableCell>
+                    {/* Add other columns as needed */}
+                    <TableCell>Neck (cm)</TableCell>
+                    <TableCell>Shoulder (cm)</TableCell>
+                    <TableCell>Chest (cm)</TableCell>
+                    <TableCell>Biceps (cm)</TableCell>
+                    <TableCell>Forearm (cm)</TableCell>
+                    <TableCell>Abdomen (cm)</TableCell>
+                    <TableCell>Hips (cm)</TableCell>
+                    <TableCell>Thighs (cm)</TableCell>
+                    <TableCell>Calf (cm)</TableCell>
+                    <TableCell>Progress Picture</TableCell>
                   </>
                 )}
-                <TableCell>
-                  <IconButton onClick={() => onEdit(index)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton onClick={() => onDelete(index)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {sortedData.map((measurement) => (
+                <TableRow key={measurement.id}>
+                  <TableCell>{formattedDate(measurement.date)}</TableCell>
+                  <TableCell>{measurement.weight}</TableCell>
+                  {showAllColumns && ( // Render additional columns based on checkbox
+                    <>
+                      <TableCell>{measurement.waist}</TableCell>
+                      <TableCell>{measurement.bodyFat}</TableCell>
+                      <TableCell>{measurement.neck}</TableCell>
+                      <TableCell>{measurement.shoulder}</TableCell>
+                      <TableCell>{measurement.chest}</TableCell>
+                      <TableCell>{measurement.biceps}</TableCell>
+                      <TableCell>{measurement.forearm}</TableCell>
+                      <TableCell>{measurement.abdomen}</TableCell>
+                      <TableCell>{measurement.hips}</TableCell>
+                      <TableCell>{measurement.thighs}</TableCell>
+                      <TableCell>{measurement.calf}</TableCell>
+                      <TableCell>
+                        {measurement.progressPicture && (
+                          <img
+                            src={measurement.progressPicture}
+                            alt="Progress"
+                            width="50"
+                            height="50"
+                            style={{ borderRadius: "50%" }}
+                          />
+                        )}
+                      </TableCell>
+                    </>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </div>
   );
 };

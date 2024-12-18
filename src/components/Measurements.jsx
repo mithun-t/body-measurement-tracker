@@ -1,63 +1,95 @@
 import React, { useState, useEffect } from "react";
-import { Fab } from "@mui/material";
+import axios from "axios";
+import {
+  Fab,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MeasurementForm from "./MeasurementForm";
 import MeasurementList from "./MeasurementList";
 
+const BASE_URL = "http://localhost:5147/api";
+
 const BodyMeasurementTracker = () => {
+  // State management
   const [open, setOpen] = useState(false);
   const [measurementData, setMeasurementData] = useState([]);
-  const [editingIndex, setEditingIndex] = useState(null); // For edit mode
+  const [editingMeasurement, setEditingMeasurement] = useState(null);
+  const [error, setError] = useState(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+  const [userId, setUserId] = useState(1); // Hardcoded for now, replace with actual user ID
 
-  // Fetch saved data from localStorage on component mount
-  useEffect(() => {
-    let savedMeasurements =
-      JSON.parse(localStorage.getItem("measurements")) || [];
-    savedMeasurements = savedMeasurements.sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    );
-    setMeasurementData(savedMeasurements);
-  }, []);
-
-  // Handle adding or editing a measurement
-  const addMeasurement = (newMeasurement) => {
-    if (editingIndex !== null) {
-      // Editing existing measurement
-      const updatedMeasurements = measurementData.map((item, index) =>
-        index === editingIndex ? newMeasurement : item
+  // Fetch measurements from API
+  const fetchMeasurements = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
+        params: { userId },
+      });
+      // Sort measurements by date in descending order
+      const sortedMeasurements = response.data.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
       );
-      setMeasurementData(updatedMeasurements);
-      localStorage.setItem("measurements", JSON.stringify(updatedMeasurements));
-      setEditingIndex(null); // Reset after editing
-    } else {
-      // Adding new measurement
-      const updatedMeasurements = [...measurementData, newMeasurement];
-      setMeasurementData(updatedMeasurements);
-      localStorage.setItem("measurements", JSON.stringify(updatedMeasurements));
+      setMeasurementData(sortedMeasurements);
+    } catch (err) {
+      setError(err.response?.data || "Failed to fetch measurements");
     }
-    setOpen(false); // Close form after adding/editing
   };
 
-  // Handle opening form for editing
-  const handleEdit = (index) => {
-    setEditingIndex(index); // Set the index of the measurement to be edited
-    setOpen(true); // Open the form for editing
-  };
+  // Initial fetch when component mounts
+  useEffect(() => {
+    fetchMeasurements();
+  }, [userId]);
 
-  // Handle deleting a measurement
-  const handleDelete = (index) => {
-    const updatedMeasurements = measurementData.filter((_, i) => i !== index);
-    setMeasurementData(updatedMeasurements);
-    localStorage.setItem("measurements", JSON.stringify(updatedMeasurements));
-  };
-
+  // Handle opening form for adding new measurement
   const handleClickOpen = () => {
+    setEditingMeasurement(null);
     setOpen(true);
-    setEditingIndex(null); // Reset editing index if adding new measurement
   };
 
+  // Handle closing form
   const handleClose = () => {
     setOpen(false);
+    setEditingMeasurement(null);
+  };
+
+  // Handle edit - prepare for editing
+  const handleEdit = (index) => {
+    setEditingMeasurement(measurementData[index]);
+    setOpen(true);
+  };
+
+  // Handle delete confirmation
+  const handleDeleteConfirmation = (index) => {
+    setDeleteConfirmation(measurementData[index]);
+  };
+
+  // Confirm delete
+  const confirmDelete = async () => {
+    if (!deleteConfirmation) return;
+
+    try {
+      await axios.delete(
+        `${BASE_URL}/BodyMeasurement/${deleteConfirmation.id}`
+      );
+      // Refresh measurements after delete
+      fetchMeasurements();
+      // Close confirmation dialog
+      setDeleteConfirmation(null);
+    } catch (err) {
+      setError(err.response?.data || "Failed to delete measurement");
+    }
+  };
+
+  // Close error snackbar
+  const handleCloseError = () => {
+    setError(null);
   };
 
   return (
@@ -67,7 +99,7 @@ const BodyMeasurementTracker = () => {
         color="primary"
         aria-label="add"
         onClick={handleClickOpen}
-        style={{ position: "fixed", bottom: 16, right: 16 }}
+        style={{ position: "fixed", bottom: 16, right: 16, zIndex: 1000 }}
       >
         <AddIcon />
       </Fab>
@@ -76,18 +108,59 @@ const BodyMeasurementTracker = () => {
       <MeasurementForm
         open={open}
         onClose={handleClose}
-        addMeasurement={addMeasurement}
-        initialData={
-          editingIndex !== null ? measurementData[editingIndex] : null
-        } // Pass initial data for editing
+        userId={userId}
+        onMeasurementAdded={fetchMeasurements}
+        editingMeasurement={editingMeasurement}
       />
 
       {/* Measurement List Component */}
       <MeasurementList
-        measurementData={measurementData}
-        onEdit={handleEdit} // Pass edit handler
-        onDelete={handleDelete} // Pass delete handler
+        userId={userId}
+        onEdit={handleEdit}
+        onDelete={handleDeleteConfirmation}
       />
+
+      {/* Error Snackbar */}
+      {error && (
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={handleCloseError}
+        >
+          <Alert
+            onClose={handleCloseError}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {error}
+          </Alert>
+        </Snackbar>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={!!deleteConfirmation}
+        onClose={() => setDeleteConfirmation(null)}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this measurement from{" "}
+            {deleteConfirmation?.date
+              ? new Date(deleteConfirmation.date).toLocaleDateString()
+              : "this date"}
+            ?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmation(null)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
