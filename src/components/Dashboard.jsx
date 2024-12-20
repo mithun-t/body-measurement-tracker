@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Paper, Typography, Grid } from "@mui/material";
+import axios from "axios";
+import { Paper, Typography, Grid, CircularProgress } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -22,16 +23,46 @@ ChartJS.register(
   Legend
 );
 
+const BASE_URL = "http://localhost:5147/api";
+
 const Dashboard = () => {
+  const [userId, setUserId] = useState(1); // Hardcoded for now, replace with actual user ID
   const [measurementData, setMeasurementData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    let savedMeasurements =
-      JSON.parse(localStorage.getItem("measurements")) || [];
-    savedMeasurements = savedMeasurements.sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
+    const fetchMeasurements = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
+          params: { userId },
+        });
+        const sortedMeasurements = response.data.sort(
+          (a, b) => new Date(a.date) - new Date(b.date)
+        );
+        setMeasurementData(sortedMeasurements);
+        setLoading(false);
+      } catch (err) {
+        setError(err.response?.data || "Failed to fetch measurements");
+        setLoading(false);
+      }
+    };
+
+    fetchMeasurements();
+  }, [userId]);
+
+  if (loading) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return (
+      <Typography color="error" variant="body1">
+        {error}
+      </Typography>
     );
-    setMeasurementData(savedMeasurements);
-  }, []);
+  }
 
   if (measurementData.length === 0) {
     return <Typography>No data available for the dashboard.</Typography>;
@@ -42,13 +73,11 @@ const Dashboard = () => {
     measurementData.reduce((acc, curr) => acc + parseFloat(curr.weight), 0) /
     measurementData.length
   ).toFixed(2);
-  const averageBodyFat = (
-    measurementData.reduce((acc, curr) => acc + curr.bodyFat, 0) /
-    measurementData.length
-  ).toFixed(2);
 
   // Prepare data for the weight trend line chart
-  const dates = measurementData.map((entry) => entry.date);
+  const dates = measurementData.map((entry) =>
+    new Date(entry.date).toLocaleDateString()
+  );
   const weights = measurementData.map((entry) => entry.weight);
 
   const data = {

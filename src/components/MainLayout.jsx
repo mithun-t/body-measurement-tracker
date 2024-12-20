@@ -26,7 +26,7 @@ import Dashboard from "./Dashboard";
 import Measurements from "./Measurements";
 
 const drawerWidth = 240;
-const navItems = ["Home", "Measurements", "Backup"];
+const navItems = ["Home", "Measurements"];
 
 function MainLayout(props) {
   const { window } = props;

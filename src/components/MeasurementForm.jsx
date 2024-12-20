@@ -75,7 +75,6 @@ const MeasurementForm = ({
       const submissionData = {
         ...measurements,
         userId: userId,
-        // Convert empty strings to null
         waist: measurements.waist || null,
         bodyFat: measurements.bodyFat || null,
         neck: measurements.neck || null,
@@ -143,7 +142,6 @@ const MeasurementForm = ({
               margin="dense"
               step="0.1"
             />
-
             <TextField
               label={`Waist (cm)`}
               type="number"
