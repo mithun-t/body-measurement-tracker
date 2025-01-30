@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 
-const BASE_URL = "http://localhost:5147/api";
+const BASE_URL = "http://localhost:5063/api";
 
 const formattedDate = (dateString) => {
   if (!dateString) return "";
@@ -46,9 +46,10 @@ const MeasurementList = ({ userId }) => {
   const fetchMeasurements = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
-        params: { userId },
-      });
+      // const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
+      //   params: { userId },
+      // });
+      const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
       console.log(response);
       setMeasurementData(response.data);
     } catch (err) {
@@ -205,13 +206,13 @@ const MeasurementList = ({ userId }) => {
                     </TableCell>
                     <TableCell>
                       <TableSortLabel
-                        active={sortConfig.key === "bodyFat"}
+                        active={sortConfig.key === "bodyFatPercentage"}
                         direction={
-                          sortConfig.key === "bodyFat"
+                          sortConfig.key === "bodyFatPercentage"
                             ? sortConfig.direction
                             : "asc"
                         }
-                        onClick={() => handleSortRequest("bodyFat")}
+                        onClick={() => handleSortRequest("bodyFatPercentage")}
                       >
                         Body Fat (%)
                       </TableSortLabel>
@@ -235,11 +236,11 @@ const MeasurementList = ({ userId }) => {
               {sortedData.map((measurement) => (
                 <TableRow key={measurement.id}>
                   <TableCell>{formattedDate(measurement.date)}</TableCell>
-                  <TableCell>{measurement.weight}</TableCell>
+                  <TableCell>{measurement.bodyWeight}</TableCell>
                   {showAllColumns && ( // Render additional columns based on checkbox
                     <>
                       <TableCell>{measurement.waist}</TableCell>
-                      <TableCell>{measurement.bodyFat}</TableCell>
+                      <TableCell>{measurement.bodyFatPercentage}</TableCell>
                       <TableCell>{measurement.neck}</TableCell>
                       <TableCell>{measurement.shoulder}</TableCell>
                       <TableCell>{measurement.chest}</TableCell>
@@ -248,7 +249,7 @@ const MeasurementList = ({ userId }) => {
                       <TableCell>{measurement.abdomen}</TableCell>
                       <TableCell>{measurement.hips}</TableCell>
                       <TableCell>{measurement.thighs}</TableCell>
-                      <TableCell>{measurement.calf}</TableCell>
+                      <TableCell>{measurement.calves}</TableCell>
                       <TableCell>
                         {measurement.progressPicture && (
                           <img

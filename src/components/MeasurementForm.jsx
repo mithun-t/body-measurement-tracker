@@ -10,7 +10,7 @@ import {
   Alert,
 } from "@mui/material";
 
-const BASE_URL = "http://localhost:5147/api";
+const BASE_URL = "http://localhost:5063/api";
 
 const MeasurementForm = ({
   open,
@@ -22,20 +22,20 @@ const MeasurementForm = ({
   const [measurements, setMeasurements] = useState(
     editingMeasurement || {
       userId: userId,
-      date: new Date().toISOString().split("T")[0],
-      weight: "",
-      waist: "",
-      bodyFat: "",
+      measuredDate: new Date().toISOString().split("T")[0],
+      bodyWeight: "",
+      bodyFatPercentage: "",
       neck: "",
       shoulder: "",
       chest: "",
       biceps: "",
       forearm: "",
-      abdomen: "",
+      waist: "",
       hips: "",
       thighs: "",
-      calf: "",
+      calves: "",
       progressPicture: "",
+      notes: "",
     }
   );
 
@@ -75,25 +75,26 @@ const MeasurementForm = ({
       const submissionData = {
         ...measurements,
         userId: userId,
-        waist: measurements.waist || null,
-        bodyFat: measurements.bodyFat || null,
+        bodyFatPercentage: measurements.bodyFatPercentage || null,
+        bodyWeight: measurements.bodyWeight || null,
         neck: measurements.neck || null,
         shoulder: measurements.shoulder || null,
         chest: measurements.chest || null,
         biceps: measurements.biceps || null,
         forearm: measurements.forearm || null,
-        abdomen: measurements.abdomen || null,
+        waist: measurements.waist || null,
         hips: measurements.hips || null,
         thighs: measurements.thighs || null,
-        calf: measurements.calf || null,
+        calves: measurements.calves || null,
         progressPicture: measurements.progressPicture || null,
+        notes: measurements.notes || null,
       };
-
       // Send to API
-      const response = await axios.post(
-        `${BASE_URL}/BodyMeasurement`,
-        submissionData
-      );
+      await axios.post(`${BASE_URL}/BodyMeasurement`, submissionData);
+
+      const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
+      console.log(response);
+      setMeasurements(response.data);
 
       // Notify parent component
       onMeasurementAdded();
@@ -120,10 +121,10 @@ const MeasurementForm = ({
         <DialogContent>
           <form onSubmit={handleSubmit}>
             <TextField
-              label="Date"
+              label="Measured Date"
               type="date"
-              name="date"
-              value={measurements.date}
+              name="measuredDate"
+              value={measurements.measuredDate}
               onChange={handleChange}
               fullWidth
               required
@@ -134,28 +135,20 @@ const MeasurementForm = ({
             <TextField
               label="Weight (kg)"
               type="number"
-              name="weight"
-              value={measurements.weight}
+              name="bodyWeight"
+              value={measurements.bodyWeight}
               onChange={handleChange}
               fullWidth
               required
               margin="dense"
               step="0.1"
             />
-            <TextField
-              label={`Waist (cm)`}
-              type="number"
-              name="waist"
-              value={measurements.waist}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
+
             <TextField
               label="Body Fat (%)"
               type="number"
-              name="bodyFat"
-              value={measurements.bodyFat}
+              name="bodyFatPercentage"
+              value={measurements.bodyFatPercentage}
               onChange={handleChange}
               fullWidth
               margin="dense"
@@ -206,10 +199,10 @@ const MeasurementForm = ({
               margin="dense"
             />
             <TextField
-              label={`Abdomen (cm)`}
+              label={`Waist (cm)`}
               type="number"
-              name="abdomen"
-              value={measurements.abdomen}
+              name="waist"
+              value={measurements.waist}
               onChange={handleChange}
               fullWidth
               margin="dense"
@@ -233,10 +226,10 @@ const MeasurementForm = ({
               margin="dense"
             />
             <TextField
-              label={`Calf (cm)`}
+              label={`Calves (cm)`}
               type="number"
-              name="calf"
-              value={measurements.calf}
+              name="calves"
+              value={measurements.calves}
               onChange={handleChange}
               fullWidth
               margin="dense"

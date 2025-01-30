@@ -23,7 +23,7 @@ ChartJS.register(
   Legend
 );
 
-const BASE_URL = "http://localhost:5147/api";
+const BASE_URL = "http://localhost:5063/api";
 
 const Dashboard = () => {
   const [userId, setUserId] = useState(1); // Hardcoded for now, replace with actual user ID
@@ -35,9 +35,10 @@ const Dashboard = () => {
     const fetchMeasurements = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
-          params: { userId },
-        });
+        // const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
+        //   params: { userId },
+        // });
+        const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
         const sortedMeasurements = response.data.sort(
           (a, b) => new Date(a.date) - new Date(b.date)
         );
@@ -70,15 +71,17 @@ const Dashboard = () => {
 
   // Calculate averages
   const averageWeight = (
-    measurementData.reduce((acc, curr) => acc + parseFloat(curr.weight), 0) /
-    measurementData.length
+    measurementData.reduce(
+      (acc, curr) => acc + parseFloat(curr.bodyWeight),
+      0
+    ) / measurementData.length
   ).toFixed(2);
 
   // Prepare data for the weight trend line chart
   const dates = measurementData.map((entry) =>
     new Date(entry.date).toLocaleDateString()
   );
-  const weights = measurementData.map((entry) => entry.weight);
+  const weights = measurementData.map((entry) => entry.bodyWeight);
 
   const data = {
     labels: dates,

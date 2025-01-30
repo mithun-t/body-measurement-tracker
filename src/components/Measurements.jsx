@@ -15,7 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import MeasurementForm from "./MeasurementForm";
 import MeasurementList from "./MeasurementList";
 
-const BASE_URL = "http://localhost:5147/api";
+const BASE_URL = "http://localhost:5063/api";
 
 const BodyMeasurementTracker = () => {
   // State management
@@ -29,9 +29,10 @@ const BodyMeasurementTracker = () => {
   // Fetch measurements from API
   const fetchMeasurements = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
-        params: { userId },
-      });
+      // const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
+      //   params: { userId },
+      // });
+      const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
       // Sort measurements by date in descending order
       const sortedMeasurements = response.data.sort(
         (a, b) => new Date(b.date) - new Date(a.date)
