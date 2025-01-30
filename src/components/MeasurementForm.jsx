@@ -75,26 +75,25 @@ const MeasurementForm = ({
       const submissionData = {
         ...measurements,
         userId: userId,
-        bodyFatPercentage: measurements.bodyFatPercentage || null,
-        bodyWeight: measurements.bodyWeight || null,
-        neck: measurements.neck || null,
-        shoulder: measurements.shoulder || null,
-        chest: measurements.chest || null,
-        biceps: measurements.biceps || null,
-        forearm: measurements.forearm || null,
-        waist: measurements.waist || null,
-        hips: measurements.hips || null,
-        thighs: measurements.thighs || null,
-        calves: measurements.calves || null,
-        progressPicture: measurements.progressPicture || null,
-        notes: measurements.notes || null,
+        measuredDate: "2025-01-30",
+        bodyWeight: parseFloat(measurements.bodyWeight) || 0,
+        bodyFatPercentage: parseFloat(measurements.bodyFatPercentage) || 0,
+        neck: parseFloat(measurements.neck) || 0,
+        shoulder: parseFloat(measurements.shoulder) || 0,
+        chest: parseFloat(measurements.chest) || 0,
+        biceps: parseFloat(measurements.biceps) || 0,
+        forearm: parseFloat(measurements.forearm) || 0,
+        waist: parseFloat(measurements.waist) || 0,
+        hips: parseFloat(measurements.hips) || 0,
+        thighs: parseFloat(measurements.thighs) || 0,
+        calves: parseFloat(measurements.calves) || 0,
+        progressPicture: measurements.progressPicture || "",
+        notes: measurements.notes || "",
       };
       // Send to API
-      await axios.post(`${BASE_URL}/BodyMeasurement`, submissionData);
-
-      const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
-      console.log(response);
-      setMeasurements(response.data);
+      try {
+        await axios.post(`${BASE_URL}/BodyMeasurement`, submissionData);
+      } catch (error) {}
 
       // Notify parent component
       onMeasurementAdded();
