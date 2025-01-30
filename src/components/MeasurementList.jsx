@@ -16,6 +16,7 @@ import {
   Alert,
   CircularProgress,
   Box,
+  Button,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 
@@ -228,6 +229,7 @@ const MeasurementList = ({ userId }) => {
                     <TableCell>Thighs (cm)</TableCell>
                     <TableCell>Calf (cm)</TableCell>
                     <TableCell>Progress Picture</TableCell>
+                    <TableCell colSpan={2}>Action</TableCell>
                   </>
                 )}
               </TableRow>
@@ -235,7 +237,9 @@ const MeasurementList = ({ userId }) => {
             <TableBody>
               {sortedData.map((measurement) => (
                 <TableRow key={measurement.id}>
-                  <TableCell>{formattedDate(measurement.date)}</TableCell>
+                  <TableCell>
+                    {formattedDate(measurement.measuredDate)}
+                  </TableCell>
                   <TableCell>{measurement.bodyWeight}</TableCell>
                   {showAllColumns && ( // Render additional columns based on checkbox
                     <>
@@ -260,6 +264,24 @@ const MeasurementList = ({ userId }) => {
                             style={{ borderRadius: "50%" }}
                           />
                         )}
+                      </TableCell>
+                      <TableCell colSpan={2}>
+                        <Button
+                          size="small"
+                          color="primary"
+                          variant="contained"
+                          onClick={() => handleDelete(measurement.id)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          color="error"
+                          size="small"
+                          variant="contained"
+                          onClick={() => handleDelete(measurement.id)}
+                        >
+                          Delete
+                        </Button>
                       </TableCell>
                     </>
                   )}
