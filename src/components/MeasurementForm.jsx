@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Dialog,
@@ -38,7 +38,10 @@ const MeasurementForm = ({
       notes: "",
     }
   );
-
+  useEffect(() => {
+    if (editingMeasurement) setMeasurements(editingMeasurement);
+  }, [editingMeasurement]);
+  console.log(editingMeasurement);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -90,9 +93,17 @@ const MeasurementForm = ({
         progressPicture: measurements.progressPicture || "",
         notes: measurements.notes || "",
       };
+      console.log("ssssaa", submissionData);
       // Send to API
       try {
-        await axios.post(`${BASE_URL}/BodyMeasurement`, submissionData);
+        if (submissionData.id) {
+          await axios.put(
+            `${BASE_URL}/BodyMeasurement/${submissionData.id}`,
+            submissionData
+          );
+        } else {
+          await axios.post(`${BASE_URL}/BodyMeasurement`, submissionData);
+        }
       } catch (error) {}
 
       // Notify parent component

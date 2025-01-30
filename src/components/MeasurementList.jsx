@@ -32,7 +32,7 @@ const formattedDate = (dateString) => {
   });
 };
 
-const MeasurementList = ({ userId }) => {
+const MeasurementList = ({ userId, onEdit, editData }) => {
   const [measurementData, setMeasurementData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,7 +42,6 @@ const MeasurementList = ({ userId }) => {
   });
   const [showAllColumns, setShowAllColumns] = useState(false);
   const [editingMeasurement, setEditingMeasurement] = useState(null);
-
   // Fetch measurements
   const fetchMeasurements = async () => {
     try {
@@ -59,6 +58,10 @@ const MeasurementList = ({ userId }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (editData) setEditingMeasurement(editData);
+  }, [editData]);
 
   useEffect(() => {
     fetchMeasurements();
@@ -270,7 +273,7 @@ const MeasurementList = ({ userId }) => {
                           size="small"
                           color="primary"
                           variant="contained"
-                          onClick={() => handleDelete(measurement.id)}
+                          onClick={() => onEdit(measurement.id)}
                         >
                           Edit
                         </Button>

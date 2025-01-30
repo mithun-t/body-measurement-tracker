@@ -61,8 +61,10 @@ const BodyMeasurementTracker = () => {
   };
 
   // Handle edit - prepare for editing
-  const handleEdit = (index) => {
-    setEditingMeasurement(measurementData[index]);
+  const handleEdit = async (id) => {
+    const response = await axios.get(`${BASE_URL}/BodyMeasurement/${id}`);
+    setEditingMeasurement(response.data);
+    console.log("L", response.data);
     setOpen(true);
   };
 
