@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  Fab,
-  Snackbar,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-} from "@mui/material";
+import { Fab, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MeasurementForm from "./MeasurementForm";
 import MeasurementList from "./MeasurementList";
@@ -34,9 +24,7 @@ const BodyMeasurementTracker = () => {
       // });
       const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
       // Sort measurements by date in descending order
-      const sortedMeasurements = response.data.sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
+      const sortedMeasurements = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
       setMeasurementData(sortedMeasurements);
     } catch (err) {
       setError(err.response?.data || "Failed to fetch measurements");
@@ -78,9 +66,7 @@ const BodyMeasurementTracker = () => {
     if (!deleteConfirmation) return;
 
     try {
-      await axios.delete(
-        `${BASE_URL}/BodyMeasurement/${deleteConfirmation.id}`
-      );
+      await axios.delete(`${BASE_URL}/BodyMeasurement/${deleteConfirmation.id}`);
       // Refresh measurements after delete
       fetchMeasurements();
       // Close confirmation dialog
@@ -98,61 +84,31 @@ const BodyMeasurementTracker = () => {
   return (
     <div>
       {/* Floating Action Button to open form */}
-      <Fab
-        color="primary"
-        aria-label="add"
-        onClick={handleClickOpen}
-        style={{ position: "fixed", bottom: 16, right: 16, zIndex: 1000 }}
-      >
+      <Fab color="primary" aria-label="add" onClick={handleClickOpen} style={{ position: "fixed", bottom: 16, right: 16, zIndex: 1000 }}>
         <AddIcon />
       </Fab>
 
       {/* Measurement Form Component */}
-      <MeasurementForm
-        open={open}
-        onClose={handleClose}
-        userId={userId}
-        onMeasurementAdded={fetchMeasurements}
-        editingMeasurement={editingMeasurement}
-      />
+      <MeasurementForm open={open} onClose={handleClose} userId={userId} onMeasurementAdded={fetchMeasurements} editingMeasurement={editingMeasurement} />
 
       {/* Measurement List Component */}
-      <MeasurementList
-        userId={userId}
-        onEdit={handleEdit}
-        onDelete={handleDeleteConfirmation}
-      />
+      <MeasurementList userId={userId} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
 
       {/* Error Snackbar */}
       {error && (
-        <Snackbar
-          open={!!error}
-          autoHideDuration={6000}
-          onClose={handleCloseError}
-        >
-          <Alert
-            onClose={handleCloseError}
-            severity="error"
-            sx={{ width: "100%" }}
-          >
+        <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
+          <Alert onClose={handleCloseError} severity="error" sx={{ width: "100%" }}>
             {error}
           </Alert>
         </Snackbar>
       )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={!!deleteConfirmation}
-        onClose={() => setDeleteConfirmation(null)}
-      >
+      <Dialog open={!!deleteConfirmation} onClose={() => setDeleteConfirmation(null)}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this measurement from{" "}
-            {deleteConfirmation?.date
-              ? new Date(deleteConfirmation.date).toLocaleDateString()
-              : "this date"}
-            ?
+            Are you sure you want to delete this measurement from {deleteConfirmation?.date ? new Date(deleteConfirmation.date).toLocaleDateString() : "this date"}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

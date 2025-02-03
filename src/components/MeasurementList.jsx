@@ -193,7 +193,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
                     Weight (kg)
                   </TableSortLabel>
                 </TableCell>
-                {showAllColumns && ( // Show additional columns based on checkbox
+                {showAllColumns && (
                   <>
                     <TableCell>
                       <TableSortLabel
