@@ -1,47 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Paper, Typography, Grid, CircularProgress } from "@mui/material";
 import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { UserContext } from "../context/userContext";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const BASE_URL = "http://localhost:5063/api";
 
 const Dashboard = () => {
-  const [userId, setUserId] = useState(1); // Hardcoded for now, replace with actual user ID
   const [measurementData, setMeasurementData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { userId } = useContext(UserContext);
   useEffect(() => {
     const fetchMeasurements = async () => {
       try {
         setLoading(true);
-        // const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
-        //   params: { userId },
-        // });
-        const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
-        const sortedMeasurements = response.data.sort(
-          (a, b) => new Date(a.date) - new Date(b.date)
-        );
+        const response = await axios.get(`${BASE_URL}/BodyMeasurement/User/${userId}`);
+        const sortedMeasurements = response.data.sort((a, b) => new Date(a.date) - new Date(b.date));
         setMeasurementData(sortedMeasurements);
         setLoading(false);
       } catch (err) {
@@ -70,17 +48,10 @@ const Dashboard = () => {
   }
 
   // Calculate averages
-  const averageWeight = (
-    measurementData.reduce(
-      (acc, curr) => acc + parseFloat(curr.bodyWeight),
-      0
-    ) / measurementData.length
-  ).toFixed(2);
+  const averageWeight = (measurementData.reduce((acc, curr) => acc + parseFloat(curr.bodyWeight), 0) / measurementData.length).toFixed(2);
 
   // Prepare data for the weight trend line chart
-  const dates = measurementData.map((entry) =>
-    new Date(entry.date).toLocaleDateString()
-  );
+  const dates = measurementData.map((entry) => new Date(entry.date).toLocaleDateString());
   const weights = measurementData.map((entry) => entry.bodyWeight);
 
   const data = {

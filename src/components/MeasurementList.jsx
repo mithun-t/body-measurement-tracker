@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import {
   Table,
@@ -40,6 +40,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
   });
   const [showAllColumns, setShowAllColumns] = useState(false);
   const [editingMeasurement, setEditingMeasurement] = useState(null);
+
   // Fetch measurements
   const fetchMeasurements = async () => {
     try {
@@ -47,7 +48,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
       // const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
       //   params: { userId },
       // });
-      const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
+      const response = await axios.get(`${BASE_URL}/BodyMeasurement/User/${userId}`);
       console.log(response);
       setMeasurementData(response.data);
     } catch (err) {

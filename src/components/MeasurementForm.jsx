@@ -85,7 +85,7 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
         if (submissionData.id) {
           await axios.put(`${BASE_URL}/BodyMeasurement/${submissionData.id}`, submissionData);
         } else {
-          await axios.post(`${BASE_URL}/BodyMeasurement`, submissionData);
+          await axios.post(`${BASE_URL}/BodyMeasurement/${userId}`, submissionData);
         }
       } catch (error) {}
 

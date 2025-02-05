@@ -1,7 +1,8 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import { UserContext } from "./context/userContext";
 
 const BASE_URL = "http://localhost:5063/api";
 
@@ -9,7 +10,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-
+  const { setUserId } = useContext(UserContext);
   const handleChange = (e) => {
     const { value, id } = e.target;
     if (id === "userName") {
@@ -25,6 +26,7 @@ const Login = () => {
       console.log(response);
       if (response.status === 200) {
         alert(response.data.message);
+        setUserId(response.data.userId);
         navigate("/body-measurement-tracker/home");
       }
     } catch (error) {

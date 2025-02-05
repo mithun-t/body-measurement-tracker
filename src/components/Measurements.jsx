@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Fab, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MeasurementForm from "./MeasurementForm";
 import MeasurementList from "./MeasurementList";
+import { UserContext } from "../context/userContext";
 
 const BASE_URL = "http://localhost:5063/api";
 
@@ -14,17 +15,13 @@ const BodyMeasurementTracker = () => {
   const [editingMeasurement, setEditingMeasurement] = useState(null);
   const [error, setError] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
-  const [userId, setUserId] = useState(1); // Hardcoded for now, replace with actual user ID
-
+  const { userId } = useContext(UserContext);
   // Fetch measurements from API
   const fetchMeasurements = async () => {
     try {
-      // const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
-      //   params: { userId },
-      // });
-      const response = await axios.get(`${BASE_URL}/BodyMeasurement`);
-      // Sort measurements by date in descending order
+      const response = await axios.get(`${BASE_URL}/BodyMeasurement/User/${userId}`);
       const sortedMeasurements = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+      console.log("response", sortedMeasurements);
       setMeasurementData(sortedMeasurements);
     } catch (err) {
       setError(err.response?.data || "Failed to fetch measurements");
