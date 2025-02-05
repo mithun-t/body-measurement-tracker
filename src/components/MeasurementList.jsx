@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Table,
@@ -30,7 +30,7 @@ const formattedDate = (dateString) => {
   });
 };
 
-const MeasurementList = ({ userId, onEdit, editData }) => {
+const MeasurementList = ({ userId, onEdit }) => {
   const [measurementData, setMeasurementData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,15 +39,11 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
     direction: "desc",
   });
   const [showAllColumns, setShowAllColumns] = useState(false);
-  const [editingMeasurement, setEditingMeasurement] = useState(null);
 
-  // Fetch measurements
   const fetchMeasurements = async () => {
     try {
       setLoading(true);
-      // const response = await axios.get(`${BASE_URL}/BodyMeasurement`, {
-      //   params: { userId },
-      // });
+
       const response = await axios.get(`${BASE_URL}/BodyMeasurement/User/${userId}`);
       console.log(response);
       setMeasurementData(response.data);
@@ -59,14 +55,9 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
   };
 
   useEffect(() => {
-    if (editData) setEditingMeasurement(editData);
-  }, [editData]);
-
-  useEffect(() => {
     fetchMeasurements();
   }, [userId]);
 
-  // Delete measurement
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${BASE_URL}/BodyMeasurement/${id}`);
@@ -76,7 +67,6 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
     }
   };
 
-  // Sorting logic
   const sortedData = React.useMemo(() => {
     const sortedArray = [...measurementData];
     sortedArray.sort((a, b) => {
@@ -100,12 +90,10 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
     setShowAllColumns((prev) => !prev);
   };
 
-  // Error handling
   const handleCloseError = () => {
     setError(null);
   };
 
-  // Loading state
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="200px">
@@ -116,7 +104,6 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
 
   return (
     <div style={{ marginTop: "2rem" }}>
-      {/* Error Snackbar */}
       {error && (
         <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
           <Alert onClose={handleCloseError} severity="error" sx={{ width: "100%" }}>
@@ -125,10 +112,8 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
         </Snackbar>
       )}
 
-      {/* Columns Toggle */}
       <FormControlLabel control={<Checkbox checked={showAllColumns} onChange={handleToggleColumns} color="primary" />} label="Display all measurements" />
 
-      {/* Measurements Table */}
       {measurementData.length === 0 ? (
         <Box textAlign="center" p={3}>
           No measurements recorded yet.
@@ -138,7 +123,6 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
           <Table size="small">
             <TableHead>
               <TableRow>
-                {/* Table headers remain similar to previous implementation */}
                 <TableCell>
                   <TableSortLabel
                     active={sortConfig.key === "date"}

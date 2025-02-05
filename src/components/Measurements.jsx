@@ -9,14 +9,13 @@ import { UserContext } from "../context/userContext";
 const BASE_URL = "http://localhost:5063/api";
 
 const BodyMeasurementTracker = () => {
-  // State management
   const [open, setOpen] = useState(false);
   const [measurementData, setMeasurementData] = useState([]);
   const [editingMeasurement, setEditingMeasurement] = useState(null);
   const [error, setError] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const { userId } = useContext(UserContext);
-  // Fetch measurements from API
+
   const fetchMeasurements = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/BodyMeasurement/User/${userId}`);
@@ -28,24 +27,20 @@ const BodyMeasurementTracker = () => {
     }
   };
 
-  // Initial fetch when component mounts
   useEffect(() => {
     fetchMeasurements();
   }, [userId]);
 
-  // Handle opening form for adding new measurement
   const handleClickOpen = () => {
     setEditingMeasurement(null);
     setOpen(true);
   };
 
-  // Handle closing form
   const handleClose = () => {
     setOpen(false);
     setEditingMeasurement(null);
   };
 
-  // Handle edit - prepare for editing
   const handleEdit = async (id) => {
     const response = await axios.get(`${BASE_URL}/BodyMeasurement/${id}`);
     setEditingMeasurement(response.data);
@@ -53,45 +48,36 @@ const BodyMeasurementTracker = () => {
     setOpen(true);
   };
 
-  // Handle delete confirmation
   const handleDeleteConfirmation = (index) => {
     setDeleteConfirmation(measurementData[index]);
   };
 
-  // Confirm delete
   const confirmDelete = async () => {
     if (!deleteConfirmation) return;
 
     try {
       await axios.delete(`${BASE_URL}/BodyMeasurement/${deleteConfirmation.id}`);
-      // Refresh measurements after delete
       fetchMeasurements();
-      // Close confirmation dialog
       setDeleteConfirmation(null);
     } catch (err) {
       setError(err.response?.data || "Failed to delete measurement");
     }
   };
 
-  // Close error snackbar
   const handleCloseError = () => {
     setError(null);
   };
 
   return (
     <div>
-      {/* Floating Action Button to open form */}
       <Fab color="primary" aria-label="add" onClick={handleClickOpen} style={{ position: "fixed", bottom: 16, right: 16, zIndex: 1000 }}>
         <AddIcon />
       </Fab>
 
-      {/* Measurement Form Component */}
       <MeasurementForm open={open} onClose={handleClose} userId={userId} onMeasurementAdded={fetchMeasurements} editingMeasurement={editingMeasurement} />
 
-      {/* Measurement List Component */}
       <MeasurementList userId={userId} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
 
-      {/* Error Snackbar */}
       {error && (
         <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
           <Alert onClose={handleCloseError} severity="error" sx={{ width: "100%" }}>
@@ -100,7 +86,6 @@ const BodyMeasurementTracker = () => {
         </Snackbar>
       )}
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={!!deleteConfirmation} onClose={() => setDeleteConfirmation(null)}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>

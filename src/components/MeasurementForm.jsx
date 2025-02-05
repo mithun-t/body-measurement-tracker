@@ -60,11 +60,10 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
     setError(null);
 
     try {
-      // Prepare the data for submission
       const submissionData = {
         ...measurements,
         userId: userId,
-        measuredDate: "2025-01-30",
+        measuredDate: new Date().toISOString().substring(0, 10),
         bodyWeight: parseFloat(measurements.bodyWeight) || 0,
         bodyFatPercentage: parseFloat(measurements.bodyFatPercentage) || 0,
         neck: parseFloat(measurements.neck) || 0,
@@ -79,8 +78,6 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
         progressPicture: measurements.progressPicture || "",
         notes: measurements.notes || "",
       };
-      console.log("ssssaa", submissionData);
-      // Send to API
       try {
         if (submissionData.id) {
           await axios.put(`${BASE_URL}/BodyMeasurement/${submissionData.id}`, submissionData);
@@ -89,10 +86,8 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
         }
       } catch (error) {}
 
-      // Notify parent component
       onMeasurementAdded();
 
-      // Reset form and close
       onClose();
     } catch (err) {
       setError(err.response?.data || "An error occurred");
