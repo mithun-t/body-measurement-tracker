@@ -1,24 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  Button,
-  Snackbar,
-  Alert,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, TextField, Button, Snackbar, Alert, Grid } from "@mui/material";
 
 const BASE_URL = "http://localhost:5063/api";
 
-const MeasurementForm = ({
-  open,
-  onClose,
-  userId,
-  onMeasurementAdded,
-  editingMeasurement = null,
-}) => {
+const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMeasurement = null }) => {
   const [measurements, setMeasurements] = useState(
     editingMeasurement || {
       userId: userId,
@@ -97,10 +83,7 @@ const MeasurementForm = ({
       // Send to API
       try {
         if (submissionData.id) {
-          await axios.put(
-            `${BASE_URL}/BodyMeasurement/${submissionData.id}`,
-            submissionData
-          );
+          await axios.put(`${BASE_URL}/BodyMeasurement/${submissionData.id}`, submissionData);
         } else {
           await axios.post(`${BASE_URL}/BodyMeasurement`, submissionData);
         }
@@ -125,11 +108,28 @@ const MeasurementForm = ({
   return (
     <>
       <Dialog open={open} onClose={onClose}>
-        <DialogTitle>
-          {editingMeasurement ? "Edit" : "Add"} Body Measurement
-        </DialogTitle>
+        <DialogTitle>{editingMeasurement ? "Edit" : "Add"} Body Measurement</DialogTitle>
         <DialogContent>
-          <form onSubmit={handleSubmit}>
+          <Form measurements={measurements} handleSubmit={handleSubmit} handleChange={handleChange} loading={loading} />
+        </DialogContent>
+      </Dialog>
+      {error && (
+        <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
+          <Alert onClose={handleCloseError} severity="error" sx={{ width: "100%" }}>
+            {error}
+          </Alert>
+        </Snackbar>
+      )}
+    </>
+  );
+};
+
+const Form = ({ measurements, handleSubmit, handleChange, loading }) => {
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
             <TextField
               label="Measured Date"
               type="date"
@@ -141,109 +141,47 @@ const MeasurementForm = ({
               InputLabelProps={{ shrink: true }}
               margin="dense"
             />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Weight (kg)" type="number" name="bodyWeight" value={measurements.bodyWeight} onChange={handleChange} fullWidth required margin="dense" step="0.1" />
+          </Grid>
 
-            <TextField
-              label="Weight (kg)"
-              type="number"
-              name="bodyWeight"
-              value={measurements.bodyWeight}
-              onChange={handleChange}
-              fullWidth
-              required
-              margin="dense"
-              step="0.1"
-            />
+          <Grid item xs={6}>
+            <TextField label="Body Fat (%)" type="number" name="bodyFatPercentage" value={measurements.bodyFatPercentage} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Neck (cm)" type="number" name="neck" value={measurements.neck} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
 
-            <TextField
-              label="Body Fat (%)"
-              type="number"
-              name="bodyFatPercentage"
-              value={measurements.bodyFatPercentage}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Neck (cm)`}
-              type="number"
-              name="neck"
-              value={measurements.neck}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Shoulder (cm)`}
-              type="number"
-              name="shoulder"
-              value={measurements.shoulder}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Chest (cm)`}
-              type="number"
-              name="chest"
-              value={measurements.chest}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Biceps (cm)`}
-              type="number"
-              name="biceps"
-              value={measurements.biceps}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Forearm (cm)`}
-              type="number"
-              name="forearm"
-              value={measurements.forearm}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Waist (cm)`}
-              type="number"
-              name="waist"
-              value={measurements.waist}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Hips (cm)`}
-              type="number"
-              name="hips"
-              value={measurements.hips}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Thighs (cm)`}
-              type="number"
-              name="thighs"
-              value={measurements.thighs}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
-            <TextField
-              label={`Calves (cm)`}
-              type="number"
-              name="calves"
-              value={measurements.calves}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
+          <Grid item xs={6}>
+            <TextField label="Shoulder (cm)" type="number" name="shoulder" value={measurements.shoulder} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Chest (cm)" type="number" name="chest" value={measurements.chest} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+
+          <Grid item xs={6}>
+            <TextField label="Biceps (cm)" type="number" name="biceps" value={measurements.biceps} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Forearm (cm)" type="number" name="forearm" value={measurements.forearm} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+
+          <Grid item xs={6}>
+            <TextField label="Waist (cm)" type="number" name="waist" value={measurements.waist} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Hips (cm)" type="number" name="hips" value={measurements.hips} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+
+          <Grid item xs={6}>
+            <TextField label="Thighs (cm)" type="number" name="thighs" value={measurements.thighs} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Calves (cm)" type="number" name="calves" value={measurements.calves} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+
+          <Grid item xs={12}>
             <TextField
               label="Progress Picture"
               type="file"
@@ -255,36 +193,15 @@ const MeasurementForm = ({
                 shrink: true,
               }}
             />
+          </Grid>
 
-            <Button
-              type="submit"
-              color="primary"
-              variant="contained"
-              disabled={loading}
-              style={{ marginTop: "1rem" }}
-              fullWidth
-            >
+          <Grid item xs={12}>
+            <Button type="submit" color="primary" variant="contained" disabled={loading} style={{ marginTop: "1rem" }} fullWidth>
               {loading ? "Saving..." : "Save"}
             </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {error && (
-        <Snackbar
-          open={!!error}
-          autoHideDuration={6000}
-          onClose={handleCloseError}
-        >
-          <Alert
-            onClose={handleCloseError}
-            severity="error"
-            sx={{ width: "100%" }}
-          >
-            {error}
-          </Alert>
-        </Snackbar>
-      )}
+          </Grid>
+        </Grid>
+      </form>
     </>
   );
 };

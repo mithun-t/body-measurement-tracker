@@ -8,7 +8,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
   TableSortLabel,
   Checkbox,
   FormControlLabel,
@@ -18,7 +17,6 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
 
 const BASE_URL = "http://localhost:5063/api";
 
@@ -82,15 +80,9 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
     const sortedArray = [...measurementData];
     sortedArray.sort((a, b) => {
       if (sortConfig.key === "date") {
-        return (
-          (new Date(a[sortConfig.key]) - new Date(b[sortConfig.key])) *
-          (sortConfig.direction === "asc" ? 1 : -1)
-        );
+        return (new Date(a[sortConfig.key]) - new Date(b[sortConfig.key])) * (sortConfig.direction === "asc" ? 1 : -1);
       } else {
-        return (
-          (a[sortConfig.key] < b[sortConfig.key] ? -1 : 1) *
-          (sortConfig.direction === "asc" ? 1 : -1)
-        );
+        return (a[sortConfig.key] < b[sortConfig.key] ? -1 : 1) * (sortConfig.direction === "asc" ? 1 : -1);
       }
     });
     return sortedArray;
@@ -99,10 +91,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
   const handleSortRequest = (key) => {
     setSortConfig((prevConfig) => ({
       key,
-      direction:
-        prevConfig.key === key && prevConfig.direction === "asc"
-          ? "desc"
-          : "asc",
+      direction: prevConfig.key === key && prevConfig.direction === "asc" ? "desc" : "asc",
     }));
   };
 
@@ -118,12 +107,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
   // Loading state
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="200px"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" height="200px">
         <CircularProgress />
       </Box>
     );
@@ -133,32 +117,15 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
     <div style={{ marginTop: "2rem" }}>
       {/* Error Snackbar */}
       {error && (
-        <Snackbar
-          open={!!error}
-          autoHideDuration={6000}
-          onClose={handleCloseError}
-        >
-          <Alert
-            onClose={handleCloseError}
-            severity="error"
-            sx={{ width: "100%" }}
-          >
+        <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
+          <Alert onClose={handleCloseError} severity="error" sx={{ width: "100%" }}>
             {error}
           </Alert>
         </Snackbar>
       )}
 
       {/* Columns Toggle */}
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={showAllColumns}
-            onChange={handleToggleColumns}
-            color="primary"
-          />
-        }
-        label="Display all measurements"
-      />
+      <FormControlLabel control={<Checkbox checked={showAllColumns} onChange={handleToggleColumns} color="primary" />} label="Display all measurements" />
 
       {/* Measurements Table */}
       {measurementData.length === 0 ? (
@@ -174,9 +141,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
                 <TableCell>
                   <TableSortLabel
                     active={sortConfig.key === "date"}
-                    direction={
-                      sortConfig.key === "date" ? sortConfig.direction : "desc"
-                    }
+                    direction={sortConfig.key === "date" ? sortConfig.direction : "desc"}
                     onClick={() => handleSortRequest("date")}
                   >
                     Date
@@ -185,9 +150,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
                 <TableCell>
                   <TableSortLabel
                     active={sortConfig.key === "weight"}
-                    direction={
-                      sortConfig.key === "weight" ? sortConfig.direction : "asc"
-                    }
+                    direction={sortConfig.key === "weight" ? sortConfig.direction : "asc"}
                     onClick={() => handleSortRequest("weight")}
                   >
                     Weight (kg)
@@ -198,11 +161,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
                     <TableCell>
                       <TableSortLabel
                         active={sortConfig.key === "waist"}
-                        direction={
-                          sortConfig.key === "waist"
-                            ? sortConfig.direction
-                            : "asc"
-                        }
+                        direction={sortConfig.key === "waist" ? sortConfig.direction : "asc"}
                         onClick={() => handleSortRequest("waist")}
                       >
                         Waist (cm)
@@ -211,11 +170,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
                     <TableCell>
                       <TableSortLabel
                         active={sortConfig.key === "bodyFatPercentage"}
-                        direction={
-                          sortConfig.key === "bodyFatPercentage"
-                            ? sortConfig.direction
-                            : "asc"
-                        }
+                        direction={sortConfig.key === "bodyFatPercentage" ? sortConfig.direction : "asc"}
                         onClick={() => handleSortRequest("bodyFatPercentage")}
                       >
                         Body Fat (%)
@@ -240,9 +195,7 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
             <TableBody>
               {sortedData.map((measurement) => (
                 <TableRow key={measurement.id}>
-                  <TableCell>
-                    {formattedDate(measurement.measuredDate)}
-                  </TableCell>
+                  <TableCell>{formattedDate(measurement.measuredDate)}</TableCell>
                   <TableCell>{measurement.bodyWeight}</TableCell>
                   {showAllColumns && ( // Render additional columns based on checkbox
                     <>
@@ -258,31 +211,13 @@ const MeasurementList = ({ userId, onEdit, editData }) => {
                       <TableCell>{measurement.thighs}</TableCell>
                       <TableCell>{measurement.calves}</TableCell>
                       <TableCell>
-                        {measurement.progressPicture && (
-                          <img
-                            src={measurement.progressPicture}
-                            alt="Progress"
-                            width="50"
-                            height="50"
-                            style={{ borderRadius: "50%" }}
-                          />
-                        )}
+                        {measurement.progressPicture && <img src={measurement.progressPicture} alt="Progress" width="50" height="50" style={{ borderRadius: "50%" }} />}
                       </TableCell>
                       <TableCell colSpan={2}>
-                        <Button
-                          size="small"
-                          color="primary"
-                          variant="contained"
-                          onClick={() => onEdit(measurement.id)}
-                        >
+                        <Button size="small" color="primary" variant="contained" onClick={() => onEdit(measurement.id)}>
                           Edit
                         </Button>
-                        <Button
-                          color="error"
-                          size="small"
-                          variant="contained"
-                          onClick={() => handleDelete(measurement.id)}
-                        >
+                        <Button color="error" size="small" variant="contained" onClick={() => handleDelete(measurement.id)}>
                           Delete
                         </Button>
                       </TableCell>

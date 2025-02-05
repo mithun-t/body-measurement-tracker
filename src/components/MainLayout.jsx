@@ -24,6 +24,7 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 
 import Dashboard from "./Dashboard";
 import Measurements from "./Measurements";
+import Login from "../Login";
 
 const drawerWidth = 240;
 const navItems = ["Home", "Measurements"];
@@ -57,10 +58,7 @@ function MainLayout(props) {
       <List>
         {navItems.map((item) => (
           <ListItem key={item} disablePadding>
-            <ListItemButton
-              sx={{ textAlign: "center" }}
-              onClick={() => handleNavClick(item)}
-            >
+            <ListItemButton sx={{ textAlign: "center" }} onClick={() => handleNavClick(item)}>
               <ListItemText primary={item} />
             </ListItemButton>
           </ListItem>
@@ -69,8 +67,7 @@ function MainLayout(props) {
     </Box>
   );
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
+  const container = window !== undefined ? () => window().document.body : undefined;
 
   const theme = createTheme({
     palette: {
@@ -84,8 +81,10 @@ function MainLayout(props) {
         return <Dashboard />;
       case "Measurements":
         return <Measurements />;
+      case "Logout":
+        return <Login />;
       default:
-        return <Dashboard />;
+        return <Login />;
     }
   };
 
@@ -95,38 +94,20 @@ function MainLayout(props) {
       <Box sx={{ display: "flex" }}>
         <AppBar component="nav">
           <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { sm: "none" } }}
-            >
+            <IconButton color="inherit" aria-label="open drawer" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, display: { sm: "none" } }}>
               <MenuIcon />
             </IconButton>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-            >
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}>
               Measurements Tracker
             </Typography>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               {navItems.map((item) => (
-                <Button
-                  key={item}
-                  sx={{ color: "#fff" }}
-                  onClick={() => handleNavClick(item)}
-                >
+                <Button key={item} sx={{ color: "#fff" }} onClick={() => handleNavClick(item)}>
                   {item}
                 </Button>
               ))}
             </Box>
-            <IconButton
-              color="inherit"
-              onClick={handleThemeChange}
-              aria-label="toggle dark mode"
-            >
+            <IconButton color="inherit" onClick={handleThemeChange} aria-label="toggle dark mode">
               {darkMode ? <LightModeIcon /> : <DarkModeIcon />}{" "}
             </IconButton>
           </Toolbar>
