@@ -1,13 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { Paper, Typography, Grid, CircularProgress } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import { UserContext } from "../context/userContext";
+import { fetchData } from "../services/measurementServices.ts";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
-const BASE_URL = "http://localhost:5063/api";
 
 const Dashboard = () => {
   const [measurementData, setMeasurementData] = useState([]);
@@ -18,8 +16,8 @@ const Dashboard = () => {
     const fetchMeasurements = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/BodyMeasurement/User/${userId}`);
-        const sortedMeasurements = response.data.sort((a, b) => new Date(a.date) - new Date(b.date));
+        const fetchedMeasurements = await fetchData(userId);
+        const sortedMeasurements = fetchedMeasurements.sort((a, b) => new Date(a.date) - new Date(b.date));
         setMeasurementData(sortedMeasurements);
         setLoading(false);
       } catch (err) {

@@ -5,6 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import MeasurementForm from "./MeasurementForm";
 import MeasurementList from "./MeasurementList";
 import { UserContext } from "../context/userContext";
+import { fetchData } from "../services/measurementServices.ts";
 
 const BASE_URL = "http://localhost:5063/api";
 
@@ -18,10 +19,11 @@ const BodyMeasurementTracker = () => {
 
   const fetchMeasurements = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/BodyMeasurement/User/${userId}`);
-      const sortedMeasurements = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const fetchedMeasurements = await fetchData(userId);
+      const sortedMeasurements = fetchedMeasurements.sort((a, b) => new Date(b.date) - new Date(a.date));
       console.log("response", sortedMeasurements);
       setMeasurementData(sortedMeasurements);
+      console.log("measadded", sortedMeasurements);
     } catch (err) {
       setError(err.response?.data || "Failed to fetch measurements");
     }

@@ -17,6 +17,7 @@ import {
   Box,
   Button,
 } from "@mui/material";
+import { fetchData } from "../services/measurementServices.ts";
 
 const BASE_URL = "http://localhost:5063/api";
 
@@ -39,14 +40,11 @@ const MeasurementList = ({ userId, onEdit }) => {
     direction: "desc",
   });
   const [showAllColumns, setShowAllColumns] = useState(false);
-
   const fetchMeasurements = async () => {
     try {
       setLoading(true);
-
-      const response = await axios.get(`${BASE_URL}/BodyMeasurement/User/${userId}`);
-      console.log(response);
-      setMeasurementData(response.data);
+      const fetchedMeasurements = await fetchData(userId);
+      setMeasurementData(fetchedMeasurements);
     } catch (err) {
       setError(err.response?.data || "Failed to fetch measurements");
     } finally {
@@ -61,7 +59,7 @@ const MeasurementList = ({ userId, onEdit }) => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${BASE_URL}/BodyMeasurement/${id}`);
-      fetchMeasurements(); // Refresh the list
+      fetchMeasurements();
     } catch (err) {
       setError(err.response?.data || "Failed to delete measurement");
     }
