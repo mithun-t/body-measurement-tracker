@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import {
   Table,
@@ -17,7 +17,7 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { fetchData } from "../services/measurementServices.ts";
+import { MeasurementContext } from "../context/measurementContext.js";
 
 const BASE_URL = "http://localhost:5063/api";
 
@@ -32,6 +32,7 @@ const formattedDate = (dateString) => {
 };
 
 const MeasurementList = ({ userId, onEdit }) => {
+  const { measurements } = useContext(MeasurementContext);
   const [measurementData, setMeasurementData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,8 +44,7 @@ const MeasurementList = ({ userId, onEdit }) => {
   const fetchMeasurements = async () => {
     try {
       setLoading(true);
-      const fetchedMeasurements = await fetchData(userId);
-      setMeasurementData(fetchedMeasurements);
+      setMeasurementData(measurements);
     } catch (err) {
       setError(err.response?.data || "Failed to fetch measurements");
     } finally {
@@ -54,7 +54,7 @@ const MeasurementList = ({ userId, onEdit }) => {
 
   useEffect(() => {
     fetchMeasurements();
-  }, [userId]);
+  }, [measurements]);
 
   const handleDelete = async (id) => {
     try {

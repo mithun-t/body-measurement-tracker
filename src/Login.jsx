@@ -3,6 +3,8 @@ import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import { UserContext } from "./context/userContext";
+import { MeasurementContext } from "./context/measurementContext";
+import { fetchData } from "./services/measurementServices.ts";
 
 const BASE_URL = "http://localhost:5063/api";
 
@@ -11,6 +13,8 @@ const Login = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const { setUserId } = useContext(UserContext);
+
+  const { setMeasurements } = useContext(MeasurementContext);
   const handleChange = (e) => {
     const { value, id } = e.target;
     if (id === "userName") {
@@ -27,6 +31,9 @@ const Login = () => {
       if (response.status === 200) {
         alert(response.data.message);
         setUserId(response.data.userId);
+        console.log(response.data.userId);
+        const fetchedMeasurement = await fetchData(response.data.userId);
+        setMeasurements(fetchedMeasurement);
         navigate("/body-measurement-tracker/home");
       }
     } catch (error) {

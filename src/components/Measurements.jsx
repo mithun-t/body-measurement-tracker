@@ -5,7 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import MeasurementForm from "./MeasurementForm";
 import MeasurementList from "./MeasurementList";
 import { UserContext } from "../context/userContext";
-import { fetchData } from "../services/measurementServices.ts";
+import { MeasurementContext } from "../context/measurementContext.js";
 
 const BASE_URL = "http://localhost:5063/api";
 
@@ -16,11 +16,11 @@ const BodyMeasurementTracker = () => {
   const [error, setError] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const { userId } = useContext(UserContext);
+  const { measurements } = useContext(MeasurementContext);
 
   const fetchMeasurements = async () => {
     try {
-      const fetchedMeasurements = await fetchData(userId);
-      const sortedMeasurements = fetchedMeasurements.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const sortedMeasurements = measurements.sort((a, b) => new Date(b.date) - new Date(a.date));
       console.log("response", sortedMeasurements);
       setMeasurementData(sortedMeasurements);
       console.log("measadded", sortedMeasurements);
@@ -31,7 +31,7 @@ const BodyMeasurementTracker = () => {
 
   useEffect(() => {
     fetchMeasurements();
-  }, [userId]);
+  }, [measurements]);
 
   const handleClickOpen = () => {
     setEditingMeasurement(null);
@@ -71,7 +71,7 @@ const BodyMeasurementTracker = () => {
   };
 
   return (
-    <div>
+    <>
       <Fab color="primary" aria-label="add" onClick={handleClickOpen} style={{ position: "fixed", bottom: 16, right: 16, zIndex: 1000 }}>
         <AddIcon />
       </Fab>
@@ -104,7 +104,7 @@ const BodyMeasurementTracker = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

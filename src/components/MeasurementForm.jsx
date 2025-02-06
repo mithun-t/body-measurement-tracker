@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Dialog, DialogTitle, DialogContent, TextField, Button, Snackbar, Alert, Grid } from "@mui/material";
+import { MeasurementContext } from "../context/measurementContext";
+import { fetchData } from "../services/measurementServices.ts";
 
 const BASE_URL = "http://localhost:5063/api";
 
-const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMeasurement = null }) => {
-  const [measurements, setMeasurements] = useState(
+const MeasurementForm = ({ open, onClose, userId, editingMeasurement = null }) => {
+  const { setMeasurements } = useContext(MeasurementContext);
+
+  const [measurementsData, setMeasurementsData] = useState(
     editingMeasurement || {
       userId: userId,
       measuredDate: new Date().toISOString().split("T")[0],
@@ -25,7 +29,7 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
     }
   );
   useEffect(() => {
-    if (editingMeasurement) setMeasurements(editingMeasurement);
+    if (editingMeasurement) setMeasurementsData(editingMeasurement);
   }, [editingMeasurement]);
   console.log(editingMeasurement);
   const [error, setError] = useState(null);
@@ -38,8 +42,8 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
       const file = files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        setMeasurements({
-          ...measurements,
+        setMeasurementsData({
+          ...measurementsData,
           progressPicture: reader.result,
         });
       };
@@ -47,8 +51,8 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
         reader.readAsDataURL(file);
       }
     } else {
-      setMeasurements({
-        ...measurements,
+      setMeasurementsData({
+        ...measurementsData,
         [name]: value,
       });
     }
@@ -61,22 +65,22 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
 
     try {
       const submissionData = {
-        ...measurements,
+        ...measurementsData,
         userId: userId,
         measuredDate: new Date().toISOString().substring(0, 10),
-        bodyWeight: parseFloat(measurements.bodyWeight) || 0,
-        bodyFatPercentage: parseFloat(measurements.bodyFatPercentage) || 0,
-        neck: parseFloat(measurements.neck) || 0,
-        shoulder: parseFloat(measurements.shoulder) || 0,
-        chest: parseFloat(measurements.chest) || 0,
-        biceps: parseFloat(measurements.biceps) || 0,
-        forearm: parseFloat(measurements.forearm) || 0,
-        waist: parseFloat(measurements.waist) || 0,
-        hips: parseFloat(measurements.hips) || 0,
-        thighs: parseFloat(measurements.thighs) || 0,
-        calves: parseFloat(measurements.calves) || 0,
-        progressPicture: measurements.progressPicture || "",
-        notes: measurements.notes || "",
+        bodyWeight: parseFloat(measurementsData.bodyWeight) || 0,
+        bodyFatPercentage: parseFloat(measurementsData.bodyFatPercentage) || 0,
+        neck: parseFloat(measurementsData.neck) || 0,
+        shoulder: parseFloat(measurementsData.shoulder) || 0,
+        chest: parseFloat(measurementsData.chest) || 0,
+        biceps: parseFloat(measurementsData.biceps) || 0,
+        forearm: parseFloat(measurementsData.forearm) || 0,
+        waist: parseFloat(measurementsData.waist) || 0,
+        hips: parseFloat(measurementsData.hips) || 0,
+        thighs: parseFloat(measurementsData.thighs) || 0,
+        calves: parseFloat(measurementsData.calves) || 0,
+        progressPicture: measurementsData.progressPicture || "",
+        notes: measurementsData.notes || "",
       };
       try {
         if (submissionData.id) {
@@ -85,9 +89,8 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
           await axios.post(`${BASE_URL}/BodyMeasurement/${userId}`, submissionData);
         }
       } catch (error) {}
-
-      onMeasurementAdded();
-
+      const fetchedMeasurement = await fetchData(userId);
+      setMeasurements(fetchedMeasurement);
       onClose();
     } catch (err) {
       setError(err.response?.data || "An error occurred");
@@ -105,7 +108,7 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>{editingMeasurement ? "Edit" : "Add"} Body Measurement</DialogTitle>
         <DialogContent>
-          <Form measurements={measurements} handleSubmit={handleSubmit} handleChange={handleChange} loading={loading} />
+          <Form measurementsData={measurementsData} handleSubmit={handleSubmit} handleChange={handleChange} loading={loading} />
         </DialogContent>
       </Dialog>
       {error && (
@@ -119,7 +122,7 @@ const MeasurementForm = ({ open, onClose, userId, onMeasurementAdded, editingMea
   );
 };
 
-const Form = ({ measurements, handleSubmit, handleChange, loading }) => {
+const Form = ({ measurementsData, handleSubmit, handleChange, loading }) => {
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -129,7 +132,7 @@ const Form = ({ measurements, handleSubmit, handleChange, loading }) => {
               label="Measured Date"
               type="date"
               name="measuredDate"
-              value={measurements.measuredDate}
+              value={measurementsData.measuredDate}
               onChange={handleChange}
               fullWidth
               required
@@ -138,42 +141,52 @@ const Form = ({ measurements, handleSubmit, handleChange, loading }) => {
             />
           </Grid>
           <Grid item xs={6}>
-            <TextField label="Weight (kg)" type="number" name="bodyWeight" value={measurements.bodyWeight} onChange={handleChange} fullWidth required margin="dense" step="0.1" />
+            <TextField
+              label="Weight (kg)"
+              type="number"
+              name="bodyWeight"
+              value={measurementsData.bodyWeight}
+              onChange={handleChange}
+              fullWidth
+              required
+              margin="dense"
+              step="0.1"
+            />
           </Grid>
 
           <Grid item xs={6}>
-            <TextField label="Body Fat (%)" type="number" name="bodyFatPercentage" value={measurements.bodyFatPercentage} onChange={handleChange} fullWidth margin="dense" />
+            <TextField label="Body Fat (%)" type="number" name="bodyFatPercentage" value={measurementsData.bodyFatPercentage} onChange={handleChange} fullWidth margin="dense" />
           </Grid>
           <Grid item xs={6}>
-            <TextField label="Neck (cm)" type="number" name="neck" value={measurements.neck} onChange={handleChange} fullWidth margin="dense" />
-          </Grid>
-
-          <Grid item xs={6}>
-            <TextField label="Shoulder (cm)" type="number" name="shoulder" value={measurements.shoulder} onChange={handleChange} fullWidth margin="dense" />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField label="Chest (cm)" type="number" name="chest" value={measurements.chest} onChange={handleChange} fullWidth margin="dense" />
+            <TextField label="Neck (cm)" type="number" name="neck" value={measurementsData.neck} onChange={handleChange} fullWidth margin="dense" />
           </Grid>
 
           <Grid item xs={6}>
-            <TextField label="Biceps (cm)" type="number" name="biceps" value={measurements.biceps} onChange={handleChange} fullWidth margin="dense" />
+            <TextField label="Shoulder (cm)" type="number" name="shoulder" value={measurementsData.shoulder} onChange={handleChange} fullWidth margin="dense" />
           </Grid>
           <Grid item xs={6}>
-            <TextField label="Forearm (cm)" type="number" name="forearm" value={measurements.forearm} onChange={handleChange} fullWidth margin="dense" />
-          </Grid>
-
-          <Grid item xs={6}>
-            <TextField label="Waist (cm)" type="number" name="waist" value={measurements.waist} onChange={handleChange} fullWidth margin="dense" />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField label="Hips (cm)" type="number" name="hips" value={measurements.hips} onChange={handleChange} fullWidth margin="dense" />
+            <TextField label="Chest (cm)" type="number" name="chest" value={measurementsData.chest} onChange={handleChange} fullWidth margin="dense" />
           </Grid>
 
           <Grid item xs={6}>
-            <TextField label="Thighs (cm)" type="number" name="thighs" value={measurements.thighs} onChange={handleChange} fullWidth margin="dense" />
+            <TextField label="Biceps (cm)" type="number" name="biceps" value={measurementsData.biceps} onChange={handleChange} fullWidth margin="dense" />
           </Grid>
           <Grid item xs={6}>
-            <TextField label="Calves (cm)" type="number" name="calves" value={measurements.calves} onChange={handleChange} fullWidth margin="dense" />
+            <TextField label="Forearm (cm)" type="number" name="forearm" value={measurementsData.forearm} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+
+          <Grid item xs={6}>
+            <TextField label="Waist (cm)" type="number" name="waist" value={measurementsData.waist} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Hips (cm)" type="number" name="hips" value={measurementsData.hips} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+
+          <Grid item xs={6}>
+            <TextField label="Thighs (cm)" type="number" name="thighs" value={measurementsData.thighs} onChange={handleChange} fullWidth margin="dense" />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField label="Calves (cm)" type="number" name="calves" value={measurementsData.calves} onChange={handleChange} fullWidth margin="dense" />
           </Grid>
 
           <Grid item xs={12}>

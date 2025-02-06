@@ -2,8 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Paper, Typography, Grid, CircularProgress } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
-import { UserContext } from "../context/userContext";
-import { fetchData } from "../services/measurementServices.ts";
+import { MeasurementContext } from "../context/measurementContext.js";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -11,13 +10,12 @@ const Dashboard = () => {
   const [measurementData, setMeasurementData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { userId } = useContext(UserContext);
+  const { measurements } = useContext(MeasurementContext);
   useEffect(() => {
     const fetchMeasurements = async () => {
       try {
         setLoading(true);
-        const fetchedMeasurements = await fetchData(userId);
-        const sortedMeasurements = fetchedMeasurements.sort((a, b) => new Date(a.date) - new Date(b.date));
+        const sortedMeasurements = measurements.sort((a, b) => new Date(a.date) - new Date(b.date));
         setMeasurementData(sortedMeasurements);
         setLoading(false);
       } catch (err) {
@@ -27,7 +25,7 @@ const Dashboard = () => {
     };
 
     fetchMeasurements();
-  }, [userId]);
+  }, [measurements]);
 
   if (loading) {
     return <CircularProgress />;
