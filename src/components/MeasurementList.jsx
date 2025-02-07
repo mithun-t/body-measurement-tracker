@@ -75,106 +75,107 @@ const MeasurementList = ({ measurements, onEdit }) => {
         </Snackbar>
       )}
 
-      <FormControlLabel control={<Checkbox checked={showAllColumns} onChange={handleToggleColumns} color="primary" />} label="Display all measurements" />
-
       {measurements.length === 0 ? (
         <Box textAlign="center" p={3}>
           No measurements recorded yet.
         </Box>
       ) : (
-        <TableContainer component={Paper}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortConfig.key === "date"}
-                    direction={sortConfig.key === "date" ? sortConfig.direction : "desc"}
-                    onClick={() => handleSortRequest("date")}
-                  >
-                    Date
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortConfig.key === "weight"}
-                    direction={sortConfig.key === "weight" ? sortConfig.direction : "asc"}
-                    onClick={() => handleSortRequest("weight")}
-                  >
-                    Weight (kg)
-                  </TableSortLabel>
-                </TableCell>
-                {showAllColumns && (
-                  <>
-                    <TableCell>
-                      <TableSortLabel
-                        active={sortConfig.key === "waist"}
-                        direction={sortConfig.key === "waist" ? sortConfig.direction : "asc"}
-                        onClick={() => handleSortRequest("waist")}
-                      >
-                        Waist (cm)
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>
-                      <TableSortLabel
-                        active={sortConfig.key === "bodyFatPercentage"}
-                        direction={sortConfig.key === "bodyFatPercentage" ? sortConfig.direction : "asc"}
-                        onClick={() => handleSortRequest("bodyFatPercentage")}
-                      >
-                        Body Fat (%)
-                      </TableSortLabel>
-                    </TableCell>
-                    <TableCell>Neck (cm)</TableCell>
-                    <TableCell>Shoulder (cm)</TableCell>
-                    <TableCell>Chest (cm)</TableCell>
-                    <TableCell>Biceps (cm)</TableCell>
-                    <TableCell>Forearm (cm)</TableCell>
-                    <TableCell>Hips (cm)</TableCell>
-                    <TableCell>Thighs (cm)</TableCell>
-                    <TableCell>Calf (cm)</TableCell>
-                    <TableCell>Progress Picture</TableCell>
-                  </>
-                )}
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sortedData.map((measurement) => (
-                <TableRow key={measurement.id}>
-                  <TableCell>{formattedDate(measurement.measuredDate)}</TableCell>
-                  <TableCell>{formatMeasurementToEmpty(measurement.bodyWeight)}</TableCell>
+        <>
+          <FormControlLabel control={<Checkbox checked={showAllColumns} onChange={handleToggleColumns} color="primary" />} label="Display all measurements" />
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <TableSortLabel
+                      active={sortConfig.key === "measuredDate"}
+                      direction={sortConfig.key === "measuredDate" ? sortConfig.direction : "desc"}
+                      onClick={() => handleSortRequest("measuredDate")}
+                    >
+                      Date
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={sortConfig.key === "weight"}
+                      direction={sortConfig.key === "weight" ? sortConfig.direction : "asc"}
+                      onClick={() => handleSortRequest("weight")}
+                    >
+                      Weight (kg)
+                    </TableSortLabel>
+                  </TableCell>
                   {showAllColumns && (
                     <>
-                      <TableCell>{formatMeasurementToEmpty(measurement.waist)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.bodyFatPercentage)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.neck)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.shoulder)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.chest)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.biceps)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.forearm)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.hips)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.thighs)}</TableCell>
-                      <TableCell>{formatMeasurementToEmpty(measurement.calves)}</TableCell>
                       <TableCell>
-                        {measurement.progressPicture && <img src={measurement.progressPicture} alt="Progress" width="50" height="50" style={{ borderRadius: "50%" }} />}
+                        <TableSortLabel
+                          active={sortConfig.key === "waist"}
+                          direction={sortConfig.key === "waist" ? sortConfig.direction : "asc"}
+                          onClick={() => handleSortRequest("waist")}
+                        >
+                          Waist (cm)
+                        </TableSortLabel>
                       </TableCell>
+                      <TableCell>
+                        <TableSortLabel
+                          active={sortConfig.key === "bodyFatPercentage"}
+                          direction={sortConfig.key === "bodyFatPercentage" ? sortConfig.direction : "asc"}
+                          onClick={() => handleSortRequest("bodyFatPercentage")}
+                        >
+                          Body Fat (%)
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>Neck (cm)</TableCell>
+                      <TableCell>Shoulder (cm)</TableCell>
+                      <TableCell>Chest (cm)</TableCell>
+                      <TableCell>Biceps (cm)</TableCell>
+                      <TableCell>Forearm (cm)</TableCell>
+                      <TableCell>Hips (cm)</TableCell>
+                      <TableCell>Thighs (cm)</TableCell>
+                      <TableCell>Calf (cm)</TableCell>
+                      <TableCell>Progress Picture</TableCell>
                     </>
                   )}
-                  <TableCell>
-                    <Box display="flex" gap={1} justifyContent="left">
-                      <Button size="small" color="primary" variant="contained" onClick={() => onEdit(measurement.id)}>
-                        Edit
-                      </Button>
-                      <Button color="error" size="small" variant="contained" onClick={() => handleDelete(measurement.id)}>
-                        Delete
-                      </Button>
-                    </Box>
-                  </TableCell>
+                  <TableCell></TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {sortedData.map((measurement) => (
+                  <TableRow key={measurement.id}>
+                    <TableCell>{formattedDate(measurement.measuredDate)}</TableCell>
+                    <TableCell>{formatMeasurementToEmpty(measurement.bodyWeight)}</TableCell>
+                    {showAllColumns && (
+                      <>
+                        <TableCell>{formatMeasurementToEmpty(measurement.waist)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.bodyFatPercentage)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.neck)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.shoulder)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.chest)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.biceps)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.forearm)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.hips)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.thighs)}</TableCell>
+                        <TableCell>{formatMeasurementToEmpty(measurement.calves)}</TableCell>
+                        <TableCell>
+                          {measurement.progressPicture && <img src={measurement.progressPicture} alt="Progress" width="50" height="50" style={{ borderRadius: "50%" }} />}
+                        </TableCell>
+                      </>
+                    )}
+                    <TableCell>
+                      <Box display="flex" gap={1} justifyContent="left">
+                        <Button size="small" color="primary" variant="contained" onClick={() => onEdit(measurement.id)}>
+                          Edit
+                        </Button>
+                        <Button color="error" size="small" variant="contained" onClick={() => handleDelete(measurement.id)}>
+                          Delete
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
       )}
     </div>
   );
