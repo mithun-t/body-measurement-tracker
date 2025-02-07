@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Dialog, DialogTitle, DialogContent, TextField, Button, Snackbar, Alert, Grid } from "@mui/material";
 import { MeasurementContext } from "../context/measurementContext";
-import { fetchData } from "../services/measurementServices.ts";
+import { fetchData } from "../services/measurementServices.js";
 
 const BASE_URL = "http://localhost:5063/api";
 

@@ -1,22 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TableSortLabel,
-  Checkbox,
-  FormControlLabel,
-  Snackbar,
-  Alert,
-  CircularProgress,
-  Box,
-  Button,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, FormControlLabel, Snackbar, Alert, Box, Button } from "@mui/material";
+import { fetchData } from "../services/measurementServices.js";
+import { UserContext } from "../context/userContext.js";
 import { MeasurementContext } from "../context/measurementContext.js";
 
 const BASE_URL = "http://localhost:5063/api";
@@ -31,42 +17,28 @@ const formattedDate = (dateString) => {
   });
 };
 
-const MeasurementList = ({ onEdit }) => {
-  const { measurements } = useContext(MeasurementContext);
-  const [measurementData, setMeasurementData] = useState([]);
-  const [loading, setLoading] = useState(true);
+const MeasurementList = ({ measurements, onEdit }) => {
+  const { setMeasurements } = useContext(MeasurementContext);
+  const { userId } = useContext(UserContext);
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({
     key: "date",
     direction: "desc",
   });
   const [showAllColumns, setShowAllColumns] = useState(false);
-  const fetchMeasurements = async () => {
-    try {
-      setLoading(true);
-      setMeasurementData(measurements);
-    } catch (err) {
-      setError(err.response?.data || "Failed to fetch measurements");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMeasurements();
-  }, [measurements]);
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${BASE_URL}/BodyMeasurement/${id}`);
-      fetchMeasurements();
+      const fetchedMeasurement = await fetchData(userId);
+      setMeasurements(fetchedMeasurement);
     } catch (err) {
       setError(err.response?.data || "Failed to delete measurement");
     }
   };
 
   const sortedData = React.useMemo(() => {
-    const sortedArray = [...measurementData];
+    const sortedArray = [...measurements];
     sortedArray.sort((a, b) => {
       if (sortConfig.key === "date") {
         return (new Date(a[sortConfig.key]) - new Date(b[sortConfig.key])) * (sortConfig.direction === "asc" ? 1 : -1);
@@ -75,7 +47,7 @@ const MeasurementList = ({ onEdit }) => {
       }
     });
     return sortedArray;
-  }, [measurementData, sortConfig]);
+  }, [measurements, sortConfig]);
 
   const handleSortRequest = (key) => {
     setSortConfig((prevConfig) => ({
@@ -92,14 +64,6 @@ const MeasurementList = ({ onEdit }) => {
     setError(null);
   };
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="200px">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   const formatMeasurementToEmpty = (measurement) => {
     return Number(measurement) === 0 ? "" : measurement;
   };
@@ -115,7 +79,7 @@ const MeasurementList = ({ onEdit }) => {
 
       <FormControlLabel control={<Checkbox checked={showAllColumns} onChange={handleToggleColumns} color="primary" />} label="Display all measurements" />
 
-      {measurementData.length === 0 ? (
+      {measurements.length === 0 ? (
         <Box textAlign="center" p={3}>
           No measurements recorded yet.
         </Box>

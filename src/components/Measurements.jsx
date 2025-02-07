@@ -50,10 +50,6 @@ const BodyMeasurementTracker = () => {
     setOpen(true);
   };
 
-  const handleDeleteConfirmation = (index) => {
-    setDeleteConfirmation(measurementData[index]);
-  };
-
   const confirmDelete = async () => {
     if (!deleteConfirmation) return;
 
@@ -78,7 +74,7 @@ const BodyMeasurementTracker = () => {
 
       <MeasurementForm open={open} onClose={handleClose} userId={userId} onMeasurementAdded={fetchMeasurements} editingMeasurement={editingMeasurement} />
 
-      <MeasurementList onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
+      <MeasurementList measurements={measurements} onEdit={handleEdit} />
 
       {error && (
         <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>
