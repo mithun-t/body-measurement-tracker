@@ -136,7 +136,7 @@ function MainLayout(props) {
 
         <Box component="main" sx={{ p: 3, width: "100%" }}>
           <Toolbar />
-          {renderComponent()} {/* Render the selected component */}
+          {renderComponent()}
         </Box>
       </Box>
     </ThemeProvider>

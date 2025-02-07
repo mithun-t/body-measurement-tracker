@@ -2,9 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Dialog, DialogTitle, DialogContent, TextField, Button, Snackbar, Alert, Grid } from "@mui/material";
 import { MeasurementContext } from "../context/measurementContext";
-import { fetchData } from "../services/measurementServices.js";
-
-const BASE_URL = "http://localhost:5063/api";
+import { BASE_URL, fetchData } from "../services/measurementServices.js";
 
 const MeasurementForm = ({ open, onClose, userId, editingMeasurement = null }) => {
   const { setMeasurements } = useContext(MeasurementContext);

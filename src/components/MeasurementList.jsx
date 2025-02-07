@@ -1,11 +1,9 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, Checkbox, FormControlLabel, Snackbar, Alert, Box, Button } from "@mui/material";
-import { fetchData } from "../services/measurementServices.js";
+import { BASE_URL, fetchData } from "../services/measurementServices.js";
 import { UserContext } from "../context/userContext.js";
 import { MeasurementContext } from "../context/measurementContext.js";
-
-const BASE_URL = "http://localhost:5063/api";
 
 const formattedDate = (dateString) => {
   if (!dateString) return "";
