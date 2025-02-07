@@ -100,6 +100,9 @@ const MeasurementList = ({ userId, onEdit }) => {
     );
   }
 
+  const formatMeasurementToEmpty = (measurement) => {
+    return Number(measurement) === 0 ? "" : measurement;
+  };
   return (
     <div style={{ marginTop: "2rem" }}>
       {error && (
@@ -159,53 +162,52 @@ const MeasurementList = ({ userId, onEdit }) => {
                         Body Fat (%)
                       </TableSortLabel>
                     </TableCell>
-                    {/* Add other columns as needed */}
                     <TableCell>Neck (cm)</TableCell>
                     <TableCell>Shoulder (cm)</TableCell>
                     <TableCell>Chest (cm)</TableCell>
                     <TableCell>Biceps (cm)</TableCell>
                     <TableCell>Forearm (cm)</TableCell>
-                    <TableCell>Abdomen (cm)</TableCell>
                     <TableCell>Hips (cm)</TableCell>
                     <TableCell>Thighs (cm)</TableCell>
                     <TableCell>Calf (cm)</TableCell>
                     <TableCell>Progress Picture</TableCell>
-                    <TableCell colSpan={2}>Action</TableCell>
                   </>
                 )}
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {sortedData.map((measurement) => (
                 <TableRow key={measurement.id}>
                   <TableCell>{formattedDate(measurement.measuredDate)}</TableCell>
-                  <TableCell>{measurement.bodyWeight}</TableCell>
-                  {showAllColumns && ( // Render additional columns based on checkbox
+                  <TableCell>{formatMeasurementToEmpty(measurement.bodyWeight)}</TableCell>
+                  {showAllColumns && (
                     <>
-                      <TableCell>{measurement.waist}</TableCell>
-                      <TableCell>{measurement.bodyFatPercentage}</TableCell>
-                      <TableCell>{measurement.neck}</TableCell>
-                      <TableCell>{measurement.shoulder}</TableCell>
-                      <TableCell>{measurement.chest}</TableCell>
-                      <TableCell>{measurement.biceps}</TableCell>
-                      <TableCell>{measurement.forearm}</TableCell>
-                      <TableCell>{measurement.abdomen}</TableCell>
-                      <TableCell>{measurement.hips}</TableCell>
-                      <TableCell>{measurement.thighs}</TableCell>
-                      <TableCell>{measurement.calves}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.waist)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.bodyFatPercentage)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.neck)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.shoulder)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.chest)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.biceps)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.forearm)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.hips)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.thighs)}</TableCell>
+                      <TableCell>{formatMeasurementToEmpty(measurement.calves)}</TableCell>
                       <TableCell>
                         {measurement.progressPicture && <img src={measurement.progressPicture} alt="Progress" width="50" height="50" style={{ borderRadius: "50%" }} />}
                       </TableCell>
-                      <TableCell colSpan={2}>
-                        <Button size="small" color="primary" variant="contained" onClick={() => onEdit(measurement.id)}>
-                          Edit
-                        </Button>
-                        <Button color="error" size="small" variant="contained" onClick={() => handleDelete(measurement.id)}>
-                          Delete
-                        </Button>
-                      </TableCell>
                     </>
                   )}
+                  <TableCell>
+                    <Box display="flex" gap={1} justifyContent="left">
+                      <Button size="small" color="primary" variant="contained" onClick={() => onEdit(measurement.id)}>
+                        Edit
+                      </Button>
+                      <Button color="error" size="small" variant="contained" onClick={() => handleDelete(measurement.id)}>
+                        Delete
+                      </Button>
+                    </Box>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
