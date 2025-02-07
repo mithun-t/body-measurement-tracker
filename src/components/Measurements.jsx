@@ -78,7 +78,7 @@ const BodyMeasurementTracker = () => {
 
       <MeasurementForm open={open} onClose={handleClose} userId={userId} onMeasurementAdded={fetchMeasurements} editingMeasurement={editingMeasurement} />
 
-      <MeasurementList userId={userId} onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
+      <MeasurementList onEdit={handleEdit} onDelete={handleDeleteConfirmation} />
 
       {error && (
         <Snackbar open={!!error} autoHideDuration={6000} onClose={handleCloseError}>

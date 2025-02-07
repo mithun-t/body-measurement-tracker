@@ -31,7 +31,7 @@ const formattedDate = (dateString) => {
   });
 };
 
-const MeasurementList = ({ userId, onEdit }) => {
+const MeasurementList = ({ onEdit }) => {
   const { measurements } = useContext(MeasurementContext);
   const [measurementData, setMeasurementData] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -28,10 +28,27 @@ const MeasurementForm = ({ open, onClose, userId, editingMeasurement = null }) =
       notes: "",
     }
   );
+  const clearMeasurements = () =>
+    setMeasurementsData({
+      userId: userId,
+      measuredDate: new Date().toISOString().split("T")[0],
+      bodyWeight: "",
+      bodyFatPercentage: "",
+      neck: "",
+      shoulder: "",
+      chest: "",
+      biceps: "",
+      forearm: "",
+      waist: "",
+      hips: "",
+      thighs: "",
+      calves: "",
+      progressPicture: "",
+      notes: "",
+    });
   useEffect(() => {
     if (editingMeasurement) setMeasurementsData(editingMeasurement);
   }, [editingMeasurement]);
-  console.log(editingMeasurement);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -67,7 +84,7 @@ const MeasurementForm = ({ open, onClose, userId, editingMeasurement = null }) =
       const submissionData = {
         ...measurementsData,
         userId: userId,
-        measuredDate: new Date().toISOString().substring(0, 10),
+        measuredDate: new Date(measurementsData.measuredDate).toISOString().substring(0, 10),
         bodyWeight: parseFloat(measurementsData.bodyWeight) || 0,
         bodyFatPercentage: parseFloat(measurementsData.bodyFatPercentage) || 0,
         neck: parseFloat(measurementsData.neck) || 0,
@@ -95,6 +112,7 @@ const MeasurementForm = ({ open, onClose, userId, editingMeasurement = null }) =
     } catch (err) {
       setError(err.response?.data || "An error occurred");
     } finally {
+      clearMeasurements();
       setLoading(false);
     }
   };
