@@ -24,12 +24,13 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 
 import Dashboard from "./Dashboard";
 import Measurements from "./Measurements";
-import Login from "../Login";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
-const navItems = ["Home", "Measurements"];
+const navItems = ["Home", "Measurements", "Logout"];
 
 function MainLayout(props) {
+  const navigate = useNavigate();
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [activeComponent, setActiveComponent] = React.useState("Home");
@@ -82,9 +83,9 @@ function MainLayout(props) {
       case "Measurements":
         return <Measurements />;
       case "Logout":
-        return <Login />;
+        return navigate("/body-measurement-tracker/");
       default:
-        return <Login />;
+        return navigate("/body-measurement-tracker/");
     }
   };
 
