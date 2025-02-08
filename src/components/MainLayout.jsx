@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   AppBar,
@@ -25,12 +25,19 @@ import LightModeIcon from "@mui/icons-material/LightMode";
 import Dashboard from "./Dashboard";
 import Measurements from "./Measurements";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../context/userContext";
 
 const drawerWidth = 240;
 const navItems = ["Home", "Measurements", "Logout"];
 
 function MainLayout(props) {
   const navigate = useNavigate();
+  const { userId } = useContext(UserContext);
+  useEffect(() => {
+    if (!userId) {
+      navigate("/body-measurement-tracker/");
+    }
+  }, []);
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [activeComponent, setActiveComponent] = React.useState("Home");

@@ -4,9 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import { UserContext } from "./context/userContext";
 import { MeasurementContext } from "./context/measurementContext";
-import { fetchData } from "./services/measurementServices.js";
-
-const BASE_URL = "http://localhost:5063/api";
+import { BASE_URL, fetchData } from "./services/measurementServices.js";
 
 const Login = () => {
   const navigate = useNavigate();
