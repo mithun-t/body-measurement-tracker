@@ -31,6 +31,10 @@ const Login = () => {
   const handleLogin = async () => {
     setIsLoading(true);
     try {
+      if (!userName || !password) {
+        setIsLoading(false);
+        return;
+      }
       const response = await axios.post(`${BASE_URL}/User/login`, { username: userName, password: password });
       console.log(response);
       if (response.status === 200) {
@@ -63,7 +67,9 @@ const Login = () => {
     setIsRegister(!isRegister);
   };
   const handleRegister = async () => {
+    setIsLoading(true);
     if (!userName || !password || !confirmPassword) {
+      setIsLoading(false);
       return;
     }
     if (password !== confirmPassword) {
@@ -73,6 +79,7 @@ const Login = () => {
         icon: "error",
         confirmButtonText: "OK",
       });
+      setIsLoading(false);
       return;
     }
     const registerData = { username: userName, password: password };
@@ -99,6 +106,7 @@ const Login = () => {
       });
       console.error(error);
     }
+    setIsLoading(false);
   };
   return (
     <Container maxWidth="xs">
